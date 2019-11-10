@@ -13,27 +13,31 @@ def get_parser(syntax: SyntaxType, parser_args: Iterable[Tuple[str, object]]):
     return get_instance(parser_classes[syntax], parser_args)
 
 
-def get_engine(engine: EngineType, simulate: bool, engine_args: Iterable[Tuple[str, object]]):
+def get_engine(engine: EngineType, simulate: bool, admit_incomplete: bool,
+               engine_args: Iterable[Tuple[str, object]]):
     engine_args = dict(engine_args)
     engine_args.update(simulate=simulate)
+    engine_args.update(admit_incomplete=admit_incomplete)
     return get_instance(engine_classes[engine], engine_args)
 
 
 def run_queries(engine: EngineType, engine_args: Iterable[Tuple[str, object]],
                 syntax: SyntaxType, parser_args: Iterable[Tuple[str, object]],
                 queries: Iterable[str], input_streams: Iterable[TextIO],
-                simulate: bool) -> Tuple[str, int, int, int]:
-    engine = get_engine(engine, simulate, engine_args)
+                simulate: bool, admit_incomplete: bool) -> Tuple[str, int, int, int, int, int, int]:
+    engine = get_engine(engine, simulate, admit_incomplete, engine_args)
     parser = get_parser(syntax, parser_args)
 
     for code in queries:
         for query_name, exp in parser.get_symbolic_expression(StringIO(code), only_one_query=True):
-            yield (query_name, *engine.get_total_amount(query_name, exp, parser.associations))
+            results = engine.get_total_amount(query_name, exp, parser.associations)
+            yield (query_name, *results)
 
     for code in input_streams:
         parser.set_namespace(code.name)
         for query_name, exp in parser.get_symbolic_expression(code, only_one_query=False):
-            yield (query_name, *engine.get_total_amount(query_name, exp, parser.associations))
+            results = engine.get_total_amount(query_name, exp, parser.associations)
+            yield (query_name, *results)
 
 
 __all__ = ['run_queries']

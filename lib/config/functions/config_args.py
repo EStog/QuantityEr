@@ -101,17 +101,25 @@ def config_args():
                                            ' The information is showed in the standard output.'
                                            f' (Default: {VerbosityLevel.DEFAULT.value})')
 
-    # ------------- Testing -------------
-    testing_group = args_parser.add_argument_group(title='testing',
-                                                   description='options to specify testing settings')
+    # ------------- Results -------------
+    results_group = args_parser.add_argument_group(title='results',
+                                                   description='options that affect the results')
 
-    testing_group.add_argument('-s', '--simulate', action='store_true',
+    results_group.add_argument('-s', '--simulate', action='store_true',
                                dest='simulate',
                                help='activate the simulation mode.'
                                     ' In dependence of the complexity of the queries,'
                                     ' this program makes several requests to the server.'
                                     ' In simulation mode no actual request will be issued'
                                     ' to the server')
+
+    results_group.add_argument('-p', '--approximate', action='store_true',
+                               dest='admit_incomplete',
+                               help='Activate the "approximate" mode. '
+                                    'In this mode the sub-queries that can not be '
+                                    'done -because of an engine restriction or a'
+                                    'problem in the connection- are taken as if '
+                                    'they have zero results')
 
     # ------------- Engines -------------
     engines_group = args_parser.add_argument_group(title='engines',

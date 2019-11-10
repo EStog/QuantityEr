@@ -1,3 +1,5 @@
+import datetime
+import random
 import re
 import argparse
 import logging
@@ -28,6 +30,35 @@ def get_verbosity_file_caster():
 
     verbosity_file.verbosity = True
     return verbosity_file
+
+
+def get_time_prognostic(n: int, delay, waiting_factor) -> Tuple[str, str]:
+    return (str(datetime.timedelta(seconds=n * delay)),
+            str(datetime.timedelta(seconds=n * delay * waiting_factor)))
+
+
+def get_waiting_time(timeout: int, waiting_factor: int):
+    return random.randint(timeout, timeout * waiting_factor) + random.random()
+
+
+def get_included_excluded_principle_iter_amount(n: int):
+    r = 0
+    for p in range(1, n + 1):
+        r += combination_amount(n, p)
+    return r
+
+
+def combination_amount(n: int, p: int) -> int:
+    n_p = n - p
+    numerator_init = max(p, n_p)
+    denominator_end = min(p, n_p)
+    num = 1
+    for i in range(numerator_init + 1, n + 1):
+        num *= i
+    den = 1
+    for i in range(1, denominator_end + 1):
+        den *= i
+    return num // den
 
 
 def cast_tuple_from_str(values: Iterable[object], cast_funcs: Iterable[type]) -> \
@@ -95,4 +126,5 @@ def cast_to_verbosity_level_or_none(level):
 
 __all__ = ['critical_error', 'get_verbosity_file_caster',
            'output', 'verbose_output', 'cast_tuple_from_str',
-           'get_instance', 'normalize_name']
+           'get_instance', 'normalize_name',
+           'get_included_excluded_principle_iter_amount']

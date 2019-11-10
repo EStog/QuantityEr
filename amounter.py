@@ -11,7 +11,13 @@ from lib.presentation import show_engine_info, show_parser_info, \
 
 parser = config_args()
 
-args = parser.parse_args()
+args = parser.parse_args(['-i', 'query.txt',
+                          #                           '-o' 'results_async.txt',
+                          '-v', 'info',
+                          #                           '--log-file', 'debug', './debug_async.txt',
+                          '--simulate'])
+
+#args = parser.parse_args()
 
 colorama.init()
 random.seed()
@@ -33,5 +39,5 @@ if args.show_parser_defaults_info:
 for result in run_queries(args.engine_type, args.engine_args,
                           args.syntax_type, args.parser_args,
                           args.queries, args.input_files,
-                          args.simulate):
+                          args.simulate, args.admit_incomplete):
     show_result(args.simulate, *result)
