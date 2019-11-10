@@ -1,18 +1,17 @@
-import random
 import time
-import datetime
 from itertools import combinations
 from abc import abstractmethod
 from typing import Optional, Iterable, FrozenSet, Tuple, Union
 
 import github
-from github import Github, RateLimitExceededException, BadCredentialsException, GithubException
+from github import Github, RateLimitExceededException, \
+    BadCredentialsException, GithubException
 from requests import ConnectionError
 
 from lib.utilities.classes import WithDefaults
 from lib.utilities.enums import XEnum, VerbosityLevel, ExitCode
-from lib.utilities.functions import cast_tuple_from_str, normalize_name, get_waiting_time, \
-    get_included_excluded_principle_iter_amount, get_time_prognostic
+from lib.utilities.functions import cast_tuple_from_str, normalize_name, \
+    get_waiting_time, get_included_excluded_principle_iter_amount, get_time_prognostic
 from lib.internal_logic.translators import SpacesTranslator
 from lib.utilities.flip_dict import Flipdict
 
@@ -34,17 +33,17 @@ class Engine(WithDefaults):
     def get_total_amount(self, query_name: str, exp: str, associations: Flipdict) \
             -> Tuple[int, int, int, int, int, int]:
         self._verbose_output(VerbosityLevel.INFO, f'Getting results amount for {query_name} ...')
+        cache = {}
         if self._simulate:
             cache = self._cache.copy()
-            self._verbose_output(VerbosityLevel.WARNING,
-                                 'Simulation activated. Will not execute any actual query')
         translator = SpacesTranslator(associations)
         results = 0
-        self._verbose_output(VerbosityLevel.DEBUG, f'Getting total amount of sub-queries...')
+        self._verbose_output(VerbosityLevel.DEBUG, f'Getting total amount of sub-queries for {query_name}...')
         subqueries_total = self.get_sub_queries_amount(exp)
-        self._verbose_output(VerbosityLevel.INFO, f'Sub-queries amount: {subqueries_total}')
+        self._verbose_output(VerbosityLevel.INFO, f'Sub-queries amount for {query_name}: {subqueries_total}')
         time_min, time_max = self._estimated_time(subqueries_total)
-        self._verbose_output(VerbosityLevel.INFO, f'Estimated time without caching: from {time_min} to {time_max}')
+        self._verbose_output(VerbosityLevel.INFO,
+                             f'Estimated time without caching for {query_name}: from {time_min} to {time_max}')
         subqueries_to_be_done = 0
         performed_subqueries = 0
         negative_non_performed = 0

@@ -127,4 +127,6 @@ def cast_to_verbosity_level_or_none(level):
 __all__ = ['critical_error', 'get_verbosity_file_caster',
            'output', 'verbose_output', 'cast_tuple_from_str',
            'get_instance', 'normalize_name',
-           'get_included_excluded_principle_iter_amount']
+           'get_included_excluded_principle_iter_amount',
+           'cast_to_verbosity_level_or_none',
+           'get_waiting_time', 'get_time_prognostic']

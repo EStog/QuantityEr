@@ -1,7 +1,4 @@
-import logging
 from enum import Enum, unique
-
-import sys
 
 
 class XEnum(Enum):
@@ -37,6 +34,7 @@ class ExitCode(Enum):
     TYPING = 5
     CONNECTION = 6
     QUERY_ERROR = 7
+    FILE_ERROR = 8
 
 
 __all__ = ['XEnum', 'VerbosityLevel', 'ExitCode']

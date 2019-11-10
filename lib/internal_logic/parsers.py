@@ -8,7 +8,7 @@ from sympy.logic.boolalg import to_dnf
 from lib.config.consts import QUERY_NAME_FORMAT
 from lib.utilities.classes import WithDefaults
 from lib.utilities.enums import XEnum, ExitCode, VerbosityLevel
-from lib.utilities.functions import critical_error, normalize_name
+from lib.utilities.functions import critical_error, normalize_name, cast_tuple_from_str
 from lib.utilities.flip_dict import Flipdict
 
 
@@ -118,8 +118,18 @@ class Brackets_SyntaxParser(Parser):
     DISJUNCTION_END = '}'
     NEGATION_OP = "~"
 
-    def __init__(self, query_namespace: str):
+    DEFAULTS_DICT = {
+        'allow_redefine_ids': True
+    }
+
+    def __init__(self, query_namespace: str,
+                 allow_redefine_ids: Optional[bool] = None):
         super().__init__(query_namespace)
+        allow_redefine_ids, = cast_tuple_from_str(
+            (allow_redefine_ids,),
+            (bool,)
+        )
+        self._set_attributes(allow_redefine_ids=allow_redefine_ids)
 
     def _parse_expression(self, code: Parser.Code, exp: str) -> str:
         """
@@ -185,7 +195,7 @@ class Brackets_SyntaxParser(Parser):
         """<named_expression> ::=  REFERENT_DEFINITION <expression>"""
         code.next()
         nm = self._match_id(code)
-        if nm in self.names:
+        if nm in self.names and not self._allow_redefine_ids:
             self._critical_error(code, f'Identifier "{nm}" has been already defined')
         sub_exp = self._parse_expression(code, '')
         self.names[nm] = sub_exp
@@ -209,7 +219,7 @@ class Brackets_SyntaxParser(Parser):
 
     def _match_id(self, code: Parser.Code) -> str:
         """
-        ID = r"[a-zA-Z_]\w*"
+        ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
         """
         id_name = ''
         alfa = string.ascii_letters + '_'
@@ -227,8 +237,8 @@ class Brackets_SyntaxParser(Parser):
     def _match_literal(self, code):
         """
         LITERAL =
-            rf'[^{NEGATION_OP}{REF_DEF_INIT}{EXP_REF_INIT}\{CONJUNCTION_INIT}'
-            rf'\{CONJUNCTION_END}{DISJUNCTION_INIT}{DISJUNCTION_END}\"\s]+|\".+?\"'
+            f'[^{NEGATION_OP}{REF_DEF_INIT}{EXP_REF_INIT}\\{CONJUNCTION_INIT}'
+            f'\\{CONJUNCTION_END}{DISJUNCTION_INIT}{DISJUNCTION_END}\\"\\s]+|\\".+?\\"'
         """
         initials_finals = (self.NEGATION_OP + self.REF_DEF_INIT +
                            self.EXP_REF_INIT + self.CONJUNCTION_INIT +

@@ -1,6 +1,6 @@
 import argparse
 
-from lib.config.consts import APPLICATION_NAME_VERSION, QUERY_NAME_FORMAT, COMMANDLINE_NAME
+from lib.config.consts import APPLICATION_NAME_VERSION, QUERY_NAME_FORMAT, COMMANDLINE_NAME, OUTPUT_FILE_EXT
 from lib.internal_logic.engines import EngineType
 from lib.internal_logic.parsers import SyntaxType
 from lib.utilities.enums import VerbosityLevel
@@ -32,16 +32,17 @@ def config_args():
                                   ' be used, if specified, in subsequent queries from'
                                   ' the commandline. A result will be shown for each query'
                                   ' in the format'
-                                  f' {QUERY_NAME_FORMAT.format(query_namespace=COMMANDLINE_NAME, n="n")}'
-                                  ' where "n" is the position'
+                                  f' {QUERY_NAME_FORMAT.format(query_namespace=COMMANDLINE_NAME, n="N")}'
+                                  ' where N is the position'
                                   ' of the query in the commandline')
 
     # ------------- File managing -------------
     file_managing_group = args_parser.add_argument_group(title='file managing',
                                                          description='options to specify input and output files')
 
-    file_managing_group.add_argument('-i', '--input', type=argparse.FileType('r'),
-                                     action='append', default=[],
+    file_managing_group.add_argument('-i', '--input', nargs='+',
+                                     type=argparse.FileType('r'),
+                                     default=[],
                                      dest='input_files',
                                      help='input file(s).'
                                           ' Each file may contain one or many queries.'
@@ -55,14 +56,17 @@ def config_args():
                                           ' is the position of the query in the file.'
                                           ' If queries from the commandline are specified,'
                                           ' those queries will be executed first')
-    file_managing_group.add_argument('-o', '--output', type=argparse.FileType('w'),
-                                     action='append', default=[],
-                                     dest='output_files',
-                                     help='output file(s).'
+    file_managing_group.add_argument('-o', '--output-files', action='store_true',
+                                     dest='output_in_files',
+                                     help='specify that each output must be stored in a file.'
                                           ' Each output file will contain the results of each specified query.'
                                           ' First files will contain the results of the queries of the'
-                                          ' commandline if any. If there is less output files than input files,'
-                                          ' the extra information will be printed to the standard output')
+                                          ' commandline if any. The name of the files will be in the format'
+                                          f' {QUERY_NAME_FORMAT.format(query_namespace="NAME", n="N")}.'
+                                          f'{OUTPUT_FILE_EXT}'
+                                          f' where NAME is "{COMMANDLINE_NAME}" or the name of some input file'
+                                          ' and N is the corresponding query of the commandline or the referenced'
+                                          ' input file in "name", respectively')
 
     file_managing_group.add_argument('--log-file', metavar=('LEVEL', 'FILE'),
                                      nargs=2, action='append', default=[],

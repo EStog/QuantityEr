@@ -24,7 +24,8 @@ CONSOLE_OUTPUT_FORMAT = (f'{Style.DIM}'
 FILE_OUTPUT_FORMAT = ('{asctime} : {name} : '
                       '{levelname} : {message}')
 COMMANDLINE_NAME = 'CONSOLE'
-QUERY_NAME_FORMAT = '{query_namespace}.{n}'
+QUERY_NAME_FORMAT = '<{query_namespace}.{n}>'
+OUTPUT_FILE_EXT = 'out'
 
 COLOR = {
     VerbosityLevel.INFO: colorama.Fore.GREEN,
@@ -38,5 +39,5 @@ __all__ = ['APPLICATION_NAME_VERSION',
            'OUTPUT_LOGGER_NAME', 'VERBOSITY_LOGGER_NAME',
            'CONSOLE_OUTPUT_FORMAT', 'FILE_OUTPUT_FORMAT',
            'COLOR', 'COLOR_EXTRA_KEYWORD',
-           'COMMANDLINE_NAME',
-           'QUERY_NAME_FORMAT']
+           'COMMANDLINE_NAME', 'QUERY_NAME_FORMAT',
+           'OUTPUT_FILE_EXT']

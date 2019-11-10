@@ -1,14 +1,13 @@
 import logging
 from typing import TextIO, Iterable, Tuple
 
-from lib.utilities.classes import VerbosityLevel
+from lib.utilities.enums import VerbosityLevel
 from lib.config.consts import OUTPUT_LOGGER_NAME, VERBOSITY_LOGGER_NAME, \
     CONSOLE_OUTPUT_FORMAT, FILE_OUTPUT_FORMAT
 
 
 def config_loggers(silent: bool, console_verbosity: VerbosityLevel,
-                   output_files: Iterable[TextIO],
-                   log_files: Iterable[Tuple[TextIO, VerbosityLevel]]):
+                   log_files: Iterable[Tuple[VerbosityLevel, TextIO]]):
     output_logger = logging.getLogger(OUTPUT_LOGGER_NAME)
     output_logger.setLevel(logging.DEBUG)
     verbosity_logger = logging.getLogger(VERBOSITY_LOGGER_NAME)
@@ -28,10 +27,6 @@ def config_loggers(silent: bool, console_verbosity: VerbosityLevel,
         console_verbosity_handler.setLevel(console_verbosity.value.upper())
         console_verbosity_handler.setFormatter(console_formatter)
         verbosity_logger.addHandler(console_verbosity_handler)
-    for file in output_files:
-        handler = logging.StreamHandler(file)
-        handler.setFormatter(file_formatter)
-        output_logger.addHandler(handler)
     for verbosity_level, file in log_files:
         handler = logging.StreamHandler(file)
         handler.setFormatter(file_formatter)
