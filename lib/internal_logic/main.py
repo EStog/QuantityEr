@@ -59,6 +59,8 @@ def run_queries(engine: EngineType, engine_args: Iterable[Tuple[str, object]],
                 input_streams: Iterable[TextIO],
                 output_in_files: bool,
                 simulate: bool, admit_incomplete: bool) -> Tuple[str, int, int, int, int, int, int]:
+    if not queries and not input_streams:
+        exit(0)  # if the is no queries to process exit silently.
     engine = get_engine(engine, simulate, admit_incomplete, engine_args)
     parser = get_parser(syntax, parser_args)
 
