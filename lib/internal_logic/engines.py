@@ -8,6 +8,7 @@ import github
 from github import Github, RateLimitExceededException, \
     BadCredentialsException, GithubException
 from requests import ConnectionError
+from urllib3.util.retry import Retry
 
 from lib.config.consts import SUBQUERY_NAME_FORMAT, QUOTE_FORMAT
 from lib.internal_logic.caches import Cache
@@ -67,11 +68,11 @@ class Engine(WithDefaults):
             if query not in self._cache:
                 self._verbose_output(VerbosityLevel.DEBUG, f'Subquery {QUOTE_FORMAT.format(subquery_name)} to issue')
                 if not self._simulate:
-                    results_obtained, sub_amount = self._issue_query(subquery_name, query)
+                    no_error, sub_amount = self._issue_query(subquery_name, query)
                 else:
                     sub_amount = 0
-                    results_obtained = True
-                if results_obtained:
+                    no_error = True
+                if no_error:
                     self._cache[query] = sub_amount
                     self._verbose_output(VerbosityLevel.DEBUG,
                                          f'Results amount cached for subquery {QUOTE_FORMAT.format(subquery_name)}')
@@ -148,12 +149,14 @@ class GithubEngine(Engine):
         PASSW = Firm(ttype=str, default=None)
         SEARCH_TYPE = Firm(ttype=SearchType.cast_from_name, default=SearchType.DEFAULT)
         URL = Firm(ttype=str, default='https://api.github.com')
-        RETRY = Firm(ttype=int, default=5)
-        TIMEOUT = Firm(ttype=int, default=60)
         LOGGING = Firm(ttype=bool, default=False)
         WAITING_FACTOR = Firm(ttype=int, default=5)
-        AUTO_ADJUST_DELAY = Firm(bool, default=True)
-        AUTO_ADJUST_TIMEOUT = Firm(bool, default=False)
+        TOTAL_RETRY = Firm(ttype=int, default=10)
+        CONNECT_RETRY = Firm(ttype=int, default=None)
+        READ_RETRY = Firm(ttype=int, default=None)
+        STATUS_RETRY = Firm(ttype=int, default=None)
+        BACKOFF_FACTOR = Firm(ttype=int, default=5)
+        BACKOFF_MAX = Firm(ttype=int, default=300)
 
     def __init__(self, cache: Cache, simulate: bool,
                  admit_incomplete: bool, **kwargs):
@@ -164,73 +167,63 @@ class GithubEngine(Engine):
     def _set_client(self):
         if not self._simulate:
             try:
+                retry = Retry(total=self._get(self._KW.TOTAL_RETRY),
+                              connect=self._get(self._KW.CONNECT_RETRY),
+                              read=self._get(self._KW.READ_RETRY),
+                              redirect=False,
+                              status=self._get(self._KW.STATUS_RETRY),
+                              status_forcelist=[403],
+                              backoff_factor=self._get(self._KW.BACKOFF_FACTOR),
+                              raise_on_status=True,
+                              respect_retry_after_header=True)
+                retry.RETRY_AFTER_STATUS_CODES = retry.RETRY_AFTER_STATUS_CODES | {403}
+                retry.BACKOFF_MAX = self._get(self._KW.BACKOFF_MAX)
                 self._verbose_output(VerbosityLevel.DEBUG, 'Creating client...')
                 self._client = Github(login_or_token=self._get(self._KW.USER),
                                       password=self._get(self._KW.PASSW),
-                                      base_url=self._get(self._KW.URL))
+                                      base_url=self._get(self._KW.URL),
+                                      retry=retry)
                 self._verbose_output(VerbosityLevel.DEBUG, 'Client created')
-                self._verbose_output(VerbosityLevel.DEBUG, 'Getting rate limit...')
-                rate_limit = self._client.get_rate_limit().search.limit
-                self._delay = 60 / rate_limit
-                self._verbose_output(VerbosityLevel.INFO, f'Rate limit', rate_limit)
+                limit = self._client.get_rate_limit().search.limit
+                self._verbose_output(VerbosityLevel.DEBUG, 'Rate limit per minute', limit)
+                self._delay = 60/limit
+                self._verbose_output(VerbosityLevel.DEBUG, 'Delay time', self._delay)
             except BadCredentialsException as e:
                 self._critical_error(f'Authentication failed', ExitCode.AUTHENTICATION, e)
             except ConnectionError as e:
                 self._critical_error(f'Connection error', ExitCode.CONNECTION, e)
 
-    def _adjust_delay(self):
-        if self._get(self._KW.AUTO_ADJUST_DELAY):
-            self._delay = int(get_waiting_time(self._delay, self._get(self._KW.WAITING_FACTOR)))
-            self._verbose_output(VerbosityLevel.DEBUG, f'Delay adjusted to {self._delay}')
-
-    def _adjust_timeout(self):
-        if self._get(self._KW.AUTO_ADJUST_TIMEOUT):
-            self._set(self._KW.TIMEOUT, int(get_waiting_time(self._delay, self._get(self._KW.WAITING_FACTOR))))
-            self._verbose_output(VerbosityLevel.DEBUG, f'Timeout adjusted to {self._get(self._KW.TIMEOUT)}')
-
-    def _problem(self, message: str, error=None, level: VerbosityLevel = VerbosityLevel.ERROR):
-        self._verbose_output(level, message, error)
-        timeout = get_waiting_time(self._get(self._KW.TIMEOUT), self._get(self._KW.WAITING_FACTOR))
-        self._verbose_output(VerbosityLevel.WARNING, f'Waiting {timeout:.2f} seconds...')
-        time.sleep(timeout)
-        self._adjust_delay()
-        self._adjust_timeout()
-
     def _issue_query(self, name: str, query: str) -> Tuple[bool, int]:
-        waiting_factor = self._get(self._KW.WAITING_FACTOR)
-        retry = self._get(self._KW.RETRY)
         search_type = self._get(self._KW.SEARCH_TYPE)
-        for i in range(retry):
-            if i > 0:
-                self._verbose_output(VerbosityLevel.DEBUG, f'Issue retry {i} of {retry}')
-            delay = get_waiting_time(self._delay, waiting_factor)
-            self._verbose_output(VerbosityLevel.DEBUG, f'Delaying {delay:.2f} seconds')
-            time.sleep(delay)
+        delay = get_waiting_time(self._delay, self._get(self._KW.WAITING_FACTOR))
+        self._verbose_output(VerbosityLevel.DEBUG, f'Delaying {delay:.2f} seconds')
+        time.sleep(delay)
+        x = self._client.get_rate_limit().search
+        while x.remaining == 0:
+            self._verbose_output(VerbosityLevel.DEBUG, 'Rate limit reached')
+            delay = x.reset - datetime.strptime(x.raw_headers['date'], '%a, %d %b %Y %H:%M:%S %Z')
+            self._verbose_output(VerbosityLevel.DEBUG, f'Waiting {delay.seconds} seconds')
+            time.sleep(delay.seconds)
+            x = self._client.get_rate_limit().search
+            self._verbose_output(VerbosityLevel.DEBUG, f'Issuing subquery {QUOTE_FORMAT.format(name)}...')
+        try:
+            r = search_type(self._client, query)
             try:
-                while self._client.get_rate_limit().search.remaining == 0:
-                    self._problem('Rate limit reached', level=VerbosityLevel.DEBUG)
-                self._verbose_output(VerbosityLevel.DEBUG, f'Issuing subquery {QUOTE_FORMAT.format(name)}...')
-                r = search_type(self._client, query)
-                try:
-                    _ = r[0]  # <- must be done in order to get the actual totalCount
-                except IndexError as e:
-                    print(e)
-                return True, r.totalCount
-            except RateLimitExceededException as e:
-                self._problem('Rate limit exceeded', e)
-            except ConnectionError as e:
-                self._problem('Connection error', e)
-                self._set_client()
-            except GithubException as e:
-                if self._admit_incomplete:
-                    self._verbose_output(VerbosityLevel.ERROR,
-                                         f'Error while issuing subquery {QUOTE_FORMAT.format(name)}', e)
-                    self._verbose_output(VerbosityLevel.DEBUG,
-                                         f'Subquery {QUOTE_FORMAT.format(name)} will be discarded', e)
-                    return False, 0
-                else:
-                    self._critical_error(f'Error while issuing subquery {QUOTE_FORMAT.format(name)}',
-                                         ExitCode.QUERY_ERROR, e)
+                _ = r[0]  # <- must be done in order to get the actual totalCount
+            except IndexError:
+                pass
+        except GithubException as e:
+            if e.data == 422 and self._admit_incomplete:
+                self._verbose_output(VerbosityLevel.ERROR,
+                                     f'Error while issuing subquery {QUOTE_FORMAT.format(name)}', e)
+                self._verbose_output(VerbosityLevel.DEBUG,
+                                     f'Subquery {QUOTE_FORMAT.format(name)} will be discarded', e)
+                return False, 0
+            else:
+                self._critical_error(f'Error while issuing subquery {QUOTE_FORMAT.format(name)}',
+                                     ExitCode.QUERY_ERROR, e)
+        else:
+            return True, r.totalCount
         if self._admit_incomplete:
             self._verbose_output(VerbosityLevel.DEBUG,
                                  f'Retry max amount reached for subquery {QUOTE_FORMAT.format(name)}')

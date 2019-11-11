@@ -9,7 +9,7 @@ from colorama import Style
 from lib.utilities.enums import VerbosityLevel
 
 APPLICATION_NAME = 'AmountEr'
-APPLICATION_VERSION = '0.3'
+APPLICATION_VERSION = '0.4'
 APPLICATION_NAME_VERSION = f'{APPLICATION_NAME} {APPLICATION_VERSION}'
 
 OUTPUT_LOGGER_NAME = f'output'
