@@ -24,11 +24,11 @@ def config_loggers(silent: bool, console_verbosity: VerbosityLevel,
         output_logger.addHandler(console_output_handler)
     if console_verbosity:
         console_verbosity_handler = logging.StreamHandler()
-        console_verbosity_handler.setLevel(console_verbosity.value.upper())
+        console_verbosity_handler.setLevel(console_verbosity.value)
         console_verbosity_handler.setFormatter(console_formatter)
         verbosity_logger.addHandler(console_verbosity_handler)
     for verbosity_level, file in log_files:
         handler = logging.StreamHandler(file)
         handler.setFormatter(file_formatter)
-        handler.setLevel(verbosity_level.value.upper())
+        handler.setLevel(verbosity_level.value)
         verbosity_logger.addHandler(handler)

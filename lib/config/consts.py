@@ -9,7 +9,7 @@ from colorama import Style
 from lib.utilities.enums import VerbosityLevel
 
 APPLICATION_NAME = 'AmountEr'
-APPLICATION_VERSION = '0.1'
+APPLICATION_VERSION = '0.3'
 APPLICATION_NAME_VERSION = f'{APPLICATION_NAME} {APPLICATION_VERSION}'
 
 OUTPUT_LOGGER_NAME = f'output'
@@ -24,7 +24,9 @@ CONSOLE_OUTPUT_FORMAT = (f'{Style.DIM}'
 FILE_OUTPUT_FORMAT = ('{asctime} : {name} : '
                       '{levelname} : {message}')
 COMMANDLINE_NAME = 'CONSOLE'
-QUERY_NAME_FORMAT = '<{query_namespace}.{n}>'
+QUERY_NAME_FORMAT = '{query_namespace}.{i}'
+QUOTE_FORMAT = '<{}>'
+SUBQUERY_NAME_FORMAT = '{query_name}.{i}'
 OUTPUT_FILE_EXT = 'out'
 
 COLOR = {
@@ -40,4 +42,4 @@ __all__ = ['APPLICATION_NAME_VERSION',
            'CONSOLE_OUTPUT_FORMAT', 'FILE_OUTPUT_FORMAT',
            'COLOR', 'COLOR_EXTRA_KEYWORD',
            'COMMANDLINE_NAME', 'QUERY_NAME_FORMAT',
-           'OUTPUT_FILE_EXT']
+           'OUTPUT_FILE_EXT', 'QUOTE_FORMAT']

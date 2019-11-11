@@ -2,26 +2,13 @@ import logging
 from io import StringIO
 from typing import TextIO, Iterable, Tuple, Union
 
-from lib.config.consts import COMMANDLINE_NAME, OUTPUT_LOGGER_NAME, FILE_OUTPUT_FORMAT, \
+from lib.config.consts import OUTPUT_LOGGER_NAME, FILE_OUTPUT_FORMAT, \
     OUTPUT_FILE_EXT
-from lib.internal_logic.engines import EngineType, engine_classes, Engine
-from lib.internal_logic.parsers import SyntaxType, parser_classes, Parser
+from lib.internal_logic.caches import Cache, CacheType, InputCacheType
+from lib.internal_logic.engines import Engine
+from lib.internal_logic.parsers import Parser
 from lib.utilities.enums import ExitCode, VerbosityLevel
-from lib.utilities.functions import get_instance, critical_error, verbose_output
-
-
-def get_parser(syntax: SyntaxType, parser_args: Iterable[Tuple[str, object]]):
-    parser_args = dict(parser_args)
-    parser_args.update(query_namespace=COMMANDLINE_NAME)
-    return get_instance(parser_classes[syntax], parser_args)
-
-
-def get_engine(engine: EngineType, simulate: bool, admit_incomplete: bool,
-               engine_args: Iterable[Tuple[str, object]]):
-    engine_args = dict(engine_args)
-    engine_args.update(simulate=simulate)
-    engine_args.update(admit_incomplete=admit_incomplete)
-    return get_instance(engine_classes[engine], engine_args)
+from lib.utilities.functions import critical_error, verbose_output
 
 
 def __run_queries(engine: Engine, parser: Parser,
@@ -35,7 +22,7 @@ def __run_queries(engine: Engine, parser: Parser,
         if console:
             code = StringIO(code)
         else:
-            parser.set_namespace(code.name)
+            parser.set_namespace(code.name.replace('../', '..').replace('./', '.').replace('/', '.'))
         for query_name, exp in parser.get_symbolic_expression(code, only_one_query=console):
             if output_in_files:
                 filename = f'{query_name}.{OUTPUT_FILE_EXT}'
@@ -53,17 +40,10 @@ def __run_queries(engine: Engine, parser: Parser,
                     file.close()
 
 
-def run_queries(engine: EngineType, engine_args: Iterable[Tuple[str, object]],
-                syntax: SyntaxType, parser_args: Iterable[Tuple[str, object]],
-                queries: Iterable[str],
-                input_streams: Iterable[TextIO],
+def run_queries(engine: Engine, parser: Parser,
+                queries: Iterable[str], input_streams: Iterable[TextIO],
                 output_in_files: bool,
                 simulate: bool, admit_incomplete: bool) -> Tuple[str, int, int, int, int, int, int]:
-    if not queries and not input_streams:
-        exit(0)  # if the is no queries to process exit silently.
-    engine = get_engine(engine, simulate, admit_incomplete, engine_args)
-    parser = get_parser(syntax, parser_args)
-
     if simulate:
         verbose_output(VerbosityLevel.WARNING,
                        'Simulation activated. Will not execute any actual query')
@@ -77,4 +57,21 @@ def run_queries(engine: EngineType, engine_args: Iterable[Tuple[str, object]],
         yield r
 
 
-__all__ = ['run_queries']
+def update_cache(cache: Cache, input_caches: Iterable[Tuple[str, ...]]):
+    for input_cache_type, *input_cache_args in input_caches:
+        try:
+            input_cache_type = InputCacheType.cast_from_name(input_cache_type)
+        except TypeError as e:
+            critical_error(str(e), ExitCode.TYPING)
+        if len(input_cache_args) % 2 != 0:
+            critical_error(f'Arguments list for cache input must be of even size', ExitCode.TYPING)
+        kwargs = {}
+        while input_cache_args:
+            key, value, *input_cache_args = input_cache_args
+            kwargs[key] = value
+        input_cache = input_cache_type.value(**kwargs)
+        cache.update(input_cache)
+        input_cache.close()
+
+
+__all__ = ['run_queries', 'update_cache']

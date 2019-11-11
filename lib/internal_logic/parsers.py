@@ -1,15 +1,15 @@
 import string
-from typing import Optional, TextIO
 from abc import abstractmethod
+from typing import TextIO
 
 from sympy import SympifyError, simplify_logic
 from sympy.logic.boolalg import to_dnf
 
-from lib.config.consts import QUERY_NAME_FORMAT
-from lib.utilities.classes import WithDefaults
+from lib.config.consts import QUERY_NAME_FORMAT, COMMANDLINE_NAME, QUOTE_FORMAT
+from lib.utilities.classes import WithDefaults, Firm
 from lib.utilities.enums import XEnum, ExitCode, VerbosityLevel
-from lib.utilities.functions import critical_error, normalize_name, cast_tuple_from_str
 from lib.utilities.flip_dict import Flipdict
+from lib.utilities.functions import critical_error, normalize_name
 
 
 class Parser(WithDefaults):
@@ -34,9 +34,9 @@ class Parser(WithDefaults):
             while self.current_char.isspace():
                 self.next()
 
-    def __init__(self, query_namespace: str):
-        super().__init__()
-        self._query_namespace = query_namespace
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._query_namespace = COMMANDLINE_NAME
         self._current_query_number = 0
         self.names = {}
         self.associations = Flipdict()
@@ -52,25 +52,26 @@ class Parser(WithDefaults):
             self._current_query_number += 1
             query_name = QUERY_NAME_FORMAT.format(
                 query_namespace=self._query_namespace,
-                n=self._current_query_number
+                i=self._current_query_number
             )
-            self._verbose_output(VerbosityLevel.INFO, f'Parsing query {query_name} ...')
+            self._verbose_output(VerbosityLevel.INFO, f'Parsing query {QUOTE_FORMAT.format(query_name)} ...')
             exp = self._parse_expression(code, '')
-            self._verbose_output(VerbosityLevel.INFO, f'Query {query_name} parsed')
+            self._verbose_output(VerbosityLevel.INFO, f'Query {QUOTE_FORMAT.format(query_name)} parsed')
             try:
-                self._verbose_output(VerbosityLevel.DEBUG, f'Converting {query_name} to DNF ...')
+                self._verbose_output(VerbosityLevel.DEBUG, f'Converting {QUOTE_FORMAT.format(query_name)} to DNF ...')
                 exp = simplify_logic(exp)
                 exp = str(to_dnf(exp))
-                self._verbose_output(VerbosityLevel.DEBUG, f'Query {query_name} converted to DNF')
+                self._verbose_output(VerbosityLevel.DEBUG, f'Query {QUOTE_FORMAT.format(query_name)} converted to DNF')
                 yield query_name, exp
             except SympifyError as e:
-                self._critical_error(code, f'Can not convert to boolean expression query {query_name}.\n'
-                                           f'Sympify error', e)
+                self._critical_error(code,
+                                     f'Can not convert to boolean expression query {QUOTE_FORMAT.format(query_name)}.\n'
+                                     f'Sympify error', e)
             if not code.current_char.isspace():
-                self._critical_error(code, f'Extra characters in query {query_name}')
+                self._critical_error(code, f'Extra characters in query {QUOTE_FORMAT.format(query_name)}')
             code.consume_leading_spaces()
             if only_one_query and code.current_char:
-                self._critical_error(code, f'Extra characters in the query {query_name}')
+                self._critical_error(code, f'Extra characters in the query {QUOTE_FORMAT.format(query_name)}')
 
     @abstractmethod
     def _parse_expression(self, code: Code, exp: str) -> str:
@@ -118,18 +119,11 @@ class Brackets_SyntaxParser(Parser):
     DISJUNCTION_END = '}'
     NEGATION_OP = "~"
 
-    DEFAULTS_DICT = {
-        'allow_redefine_ids': True
-    }
+    class _KW(XEnum):
+        ALLOW_REDEFINE_IDS = Firm(bool, True)
 
-    def __init__(self, query_namespace: str,
-                 allow_redefine_ids: Optional[bool] = None):
-        super().__init__(query_namespace)
-        allow_redefine_ids, = cast_tuple_from_str(
-            (allow_redefine_ids,),
-            (bool,)
-        )
-        self._set_attributes(allow_redefine_ids=allow_redefine_ids)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def _parse_expression(self, code: Parser.Code, exp: str) -> str:
         """
@@ -195,7 +189,7 @@ class Brackets_SyntaxParser(Parser):
         """<named_expression> ::=  REFERENT_DEFINITION <expression>"""
         code.next()
         nm = self._match_id(code)
-        if nm in self.names and not self._allow_redefine_ids:
+        if nm in self.names and not self._get(self._KW.ALLOW_REDEFINE_IDS):
             self._critical_error(code, f'Identifier "{nm}" has been already defined')
         sub_exp = self._parse_expression(code, '')
         self.names[nm] = sub_exp
@@ -270,12 +264,8 @@ Brackets_SyntaxParser.__name__ = normalize_name(Brackets_SyntaxParser.__name__)
 
 
 class SyntaxType(XEnum):
-    BRACKETS = 'bracket'
+    BRACKETS = Brackets_SyntaxParser
     DEFAULT = BRACKETS
 
 
-parser_classes = {
-    SyntaxType.BRACKETS: Brackets_SyntaxParser
-}
-
-__all__ = ['Parser', 'Brackets_SyntaxParser', 'SyntaxType', 'parser_classes']
+__all__ = ['Parser', 'SyntaxType']

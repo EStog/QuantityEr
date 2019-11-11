@@ -1,73 +1,63 @@
-import pprint
-from lib.internal_logic.parsers import SyntaxType, parser_classes
-from lib.internal_logic.engines import EngineType, engine_classes
+from lib.config.consts import QUOTE_FORMAT
+from lib.utilities.classes import WithDefaults
 from lib.utilities.functions import output
 
 
-def show_parser_info(syntax: SyntaxType):
-    output(f'Description of {parser_classes[syntax].__name__}:\n{parser_classes[syntax].__doc__}')
+def show_object_info(obj: WithDefaults):
+    output(f'Description of {obj.__name__}:\n\n{obj.__doc__}')
 
 
-def show_engine_info(engine: EngineType):
-    output(f'Description of {engine_classes[engine].__name__}:\n{engine_classes[engine].__doc__}')
-
-
-def show_parser_defaults(syntax: SyntaxType):
-    output(f'Defaults for {parser_classes[syntax].__name__}:\n'
-           f'{pprint.pformat(parser_classes[syntax].DEFAULTS_DICT)}')
-
-
-def show_engine_defaults(engine: SyntaxType):
-    output(f'Defaults for {engine_classes[engine].__name__}:\n'
-           f'{pprint.pformat(parser_classes[engine].DEFAULTS_DICT)}')
+def show_object_defaults_info(obj: WithDefaults):
+    output(f'Defaults for {obj.__name__}:\n\n{obj.get_defaults_info()}')
 
 
 def show_result(simulate: bool,
-                queryname: str,
+                query_name: str,
                 results: int,
                 subqueries_total: int,
-                subqueries_to_be_done: int,
-                performed_subqueries: int,
-                positive_non_performed: int,
-                negative_non_performed: int):
+                issued_subqueries: int,
+                without_error_subqueries: int,
+                with_error_to_be_added: int,
+                with_error_to_be_substracted: int):
     if not simulate:
-        already_cached_subqueries = subqueries_total - subqueries_to_be_done
+        already_cached_subqueries = subqueries_total - issued_subqueries
         already_cached_queries_percent = already_cached_subqueries / subqueries_total \
             if already_cached_subqueries > 0 else 0
-        subqueries_to_be_done_percent = subqueries_to_be_done / subqueries_total \
-            if subqueries_to_be_done > 0 else 0
-        performed_subqueries_amount_percent = performed_subqueries / subqueries_total \
+        issued_subqueries_percent = issued_subqueries / subqueries_total \
+            if issued_subqueries > 0 else 0
+        without_error_subqueries_percent = without_error_subqueries / subqueries_total \
             if subqueries_total > 0 else 0
-        non_performed_subqueries = subqueries_total - performed_subqueries
-        non_performed_subqueries_percent = subqueries_total / non_performed_subqueries \
-            if non_performed_subqueries > 0 else 0
-        positive_non_performed_percent = non_performed_subqueries / positive_non_performed \
-            if positive_non_performed > 0 else 0
-        negative_non_performed_percent = non_performed_subqueries / negative_non_performed \
-            if negative_non_performed > 0 else 0
-        difference = positive_non_performed - negative_non_performed
+        with_error_subqueries = subqueries_total - without_error_subqueries
+        with_error_subqueries_percent = subqueries_total / with_error_subqueries \
+            if with_error_subqueries > 0 else 0
+        positive_with_error_percent = with_error_subqueries / with_error_to_be_added \
+            if with_error_to_be_added > 0 else 0
+        negative_with_error_percent = with_error_subqueries / with_error_to_be_substracted \
+            if with_error_to_be_substracted > 0 else 0
+        difference = with_error_to_be_added - with_error_to_be_substracted
         output(
-            (f'Results for query {queryname}:'
-             f'\n\tResults: {results}'
+            (f'Results for query {QUOTE_FORMAT.format(query_name)}:\n'
+             f'\n\tResults: {results}\n'
              f'\n\tSub-queries total: {subqueries_total}'
              f'\n\t\tAlready cached:  {already_cached_subqueries} ({already_cached_queries_percent:.5%})'
-             f'\n\t\tTo be performed: {subqueries_to_be_done} ({subqueries_to_be_done_percent:.5%})'
-             f'\n\t\t\tPerformed:     {performed_subqueries} ({performed_subqueries_amount_percent:.5%})'
-             f'\n\t\t\tNon-performed: {non_performed_subqueries} ({non_performed_subqueries_percent:.5%})'
-             f'\n\t\t\t\tTo be added:      {positive_non_performed} ({positive_non_performed_percent:.5%})'
-             f'\n\t\t\t\tTo be subtracted: {negative_non_performed} ({negative_non_performed_percent:.5%})'
+             f'\n\t\tIssued:          {issued_subqueries} ({issued_subqueries_percent:.5%})'
+             f'\n\t\t\tWithout error: {without_error_subqueries} ({without_error_subqueries_percent:.5%})'
+             f'\n\t\t\tWith error:    {with_error_subqueries} ({with_error_subqueries_percent:.5%})'
+             f'\n\t\t\t\tTo be added:      {with_error_to_be_added} ({positive_with_error_percent:.5%})'
+             f'\n\t\t\t\tTo be subtracted: {with_error_to_be_substracted} ({negative_with_error_percent:.5%})'
              f'\n\t\t\t\tDifference:       {difference}').expandtabs(
                 4)
         )
     else:
-        already_cached_subqueries = subqueries_total - subqueries_to_be_done
+        already_cached_subqueries = subqueries_total - issued_subqueries
         already_cached_queries_percent = already_cached_subqueries / subqueries_total \
             if already_cached_subqueries > 0 else 0
-        subqueries_to_be_done_percent = subqueries_to_be_done / subqueries_total \
-            if subqueries_to_be_done > 0 else 0
+        issued_subqueries_percent = issued_subqueries / subqueries_total \
+            if issued_subqueries > 0 else 0
         output(
-            (f'Results for query {queryname} in simulation mode:'
+            (f'Results for query {QUOTE_FORMAT.format(query_name)} in simulation mode:\n'
+             f'\n\tResults: {results}\n'
              f'\nSub-queries total: {subqueries_total}'
-             f'\n\tAlready cached:  {already_cached_subqueries} ({already_cached_queries_percent:.5%})'
-             f'\n\tTo be performed: {subqueries_to_be_done} ({subqueries_to_be_done_percent:.5%})').expandtabs(4)
+             f'\n\tAlready cached: {already_cached_subqueries} ({already_cached_queries_percent:.5%})'
+             f'\n\tIssued:         {issued_subqueries} ({issued_subqueries_percent:.5%})').expandtabs(4)
         )
