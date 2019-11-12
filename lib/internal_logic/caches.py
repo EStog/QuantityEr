@@ -67,4 +67,4 @@ class CacheType(XEnum):
     DEFAULT = IN_MEMORY
 
 
-__all__ = ['Cache', 'CacheType']
+__all__ = ['Cache', 'CacheType','InputCacheType']

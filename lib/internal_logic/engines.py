@@ -58,7 +58,9 @@ class Engine(WithDefaults):
         with_error_to_be_substracted = 0
         with_error_to_be_added = 0
         i = 0
+
         init = datetime.now()
+
         for query, sum_factor in self._get_subqueries(exp):
             query = translator.get_particular_query(query, associations)
             i += 1
@@ -92,7 +94,9 @@ class Engine(WithDefaults):
             results += sum_factor * sub_amount
 
         end = datetime.now()
+
         self._verbose_output(VerbosityLevel.INFO, f'Runtime for query {QUOTE_FORMAT.format(query_name)}', end - init)
+
         if self._simulate:
             self._cache = backup_cache
         return (results, subqueries_total,
@@ -155,8 +159,8 @@ class GithubEngine(Engine):
         CONNECT_RETRY = Firm(ttype=int, default=None)
         READ_RETRY = Firm(ttype=int, default=None)
         STATUS_RETRY = Firm(ttype=int, default=None)
-        BACKOFF_FACTOR = Firm(ttype=int, default=5)
-        BACKOFF_MAX = Firm(ttype=int, default=300)
+        BACKOFF_FACTOR = Firm(ttype=int, default=6)
+        BACKOFF_MAX = Firm(ttype=int, default=600)
 
     def __init__(self, cache: Cache, simulate: bool,
                  admit_incomplete: bool, **kwargs):
@@ -174,7 +178,7 @@ class GithubEngine(Engine):
                               status=self._get(self._KW.STATUS_RETRY),
                               status_forcelist=[403],
                               backoff_factor=self._get(self._KW.BACKOFF_FACTOR),
-                              raise_on_status=True,
+                              raise_on_status=False,
                               respect_retry_after_header=True)
                 retry.RETRY_AFTER_STATUS_CODES = retry.RETRY_AFTER_STATUS_CODES | {403}
                 retry.BACKOFF_MAX = self._get(self._KW.BACKOFF_MAX)
@@ -184,9 +188,10 @@ class GithubEngine(Engine):
                                       base_url=self._get(self._KW.URL),
                                       retry=retry)
                 self._verbose_output(VerbosityLevel.DEBUG, 'Client created')
+                self._verbose_output(VerbosityLevel.DEBUG, 'Getting rate limit...')
                 limit = self._client.get_rate_limit().search.limit
                 self._verbose_output(VerbosityLevel.DEBUG, 'Rate limit per minute', limit)
-                self._delay = 60/limit
+                self._delay = 60 / limit
                 self._verbose_output(VerbosityLevel.DEBUG, 'Delay time', self._delay)
             except BadCredentialsException as e:
                 self._critical_error(f'Authentication failed', ExitCode.AUTHENTICATION, e)
@@ -205,15 +210,16 @@ class GithubEngine(Engine):
             self._verbose_output(VerbosityLevel.DEBUG, f'Waiting {delay.seconds} seconds')
             time.sleep(delay.seconds)
             x = self._client.get_rate_limit().search
-            self._verbose_output(VerbosityLevel.DEBUG, f'Issuing subquery {QUOTE_FORMAT.format(name)}...')
+        self._verbose_output(VerbosityLevel.DEBUG, f'Issuing subquery {QUOTE_FORMAT.format(name)}...')
         try:
             r = search_type(self._client, query)
             try:
                 _ = r[0]  # <- must be done in order to get the actual totalCount
             except IndexError:
                 pass
+            return True, r.totalCount
         except GithubException as e:
-            if e.data == 422 and self._admit_incomplete:
+            if e.status == 422 and self._admit_incomplete:
                 self._verbose_output(VerbosityLevel.ERROR,
                                      f'Error while issuing subquery {QUOTE_FORMAT.format(name)}', e)
                 self._verbose_output(VerbosityLevel.DEBUG,
@@ -222,16 +228,6 @@ class GithubEngine(Engine):
             else:
                 self._critical_error(f'Error while issuing subquery {QUOTE_FORMAT.format(name)}',
                                      ExitCode.QUERY_ERROR, e)
-        else:
-            return True, r.totalCount
-        if self._admit_incomplete:
-            self._verbose_output(VerbosityLevel.DEBUG,
-                                 f'Retry max amount reached for subquery {QUOTE_FORMAT.format(name)}')
-            self._verbose_output(VerbosityLevel.DEBUG, f'Query {QUOTE_FORMAT.format(name)} will be discarded')
-            return False, 0
-        else:
-            self._critical_error(f'Retry max amount reached for query {QUOTE_FORMAT.format(name)}',
-                                 ExitCode.QUERY_ERROR)
 
     def _estimated_time(self, subqueries_total: int) -> Tuple[str, str]:
         return get_time_prognostic(subqueries_total, self._delay, self._get(self._KW.WAITING_FACTOR))

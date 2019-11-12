@@ -4,7 +4,7 @@ from typing import TextIO, Iterable, Tuple, Union
 
 from lib.config.consts import OUTPUT_LOGGER_NAME, FILE_OUTPUT_FORMAT, \
     OUTPUT_FILE_EXT
-from lib.internal_logic.caches import Cache, CacheType, InputCacheType
+from lib.internal_logic.caches import Cache, InputCacheType
 from lib.internal_logic.engines import Engine
 from lib.internal_logic.parsers import Parser
 from lib.utilities.enums import ExitCode, VerbosityLevel
@@ -49,7 +49,7 @@ def run_queries(engine: Engine, parser: Parser,
                        'Simulation activated. Will not execute any actual query')
     elif admit_incomplete:
         verbose_output(VerbosityLevel.WARNING,
-                       'Approximate mode activated. Will continue in case of critical error')
+                       'Approximate mode activated. Will continue in case of validation error from server')
 
     for r in __run_queries(engine, parser, queries, output_in_files, console=True):
         yield r
