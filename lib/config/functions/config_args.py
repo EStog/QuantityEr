@@ -1,15 +1,21 @@
 import argparse
+from pathlib import Path
 
 from lib.config.consts import APPLICATION_NAME_VERSION, QUERY_NAME_FORMAT, COMMANDLINE_NAME, OUTPUT_FILE_EXT
-from lib.internal_logic.caches import CacheType, InputCacheType
+from lib.internal_logic.caches import CacheType
 from lib.internal_logic.engines import EngineType
 from lib.internal_logic.parsers import SyntaxType
 from lib.utilities.enums import VerbosityLevel
-from lib.utilities.functions import cast_to_verbosity_level_or_none, get_tuple_caster
+from lib.utilities.functions import get_tuple_caster, get_caster_to_optional
+
+
+class CustomArgumentParser(argparse.ArgumentParser):
+    def convert_arg_line_to_args(self, arg_line):
+        return arg_line.split()
 
 
 def config_args():
-    args_parser = argparse.ArgumentParser(
+    args_parser = CustomArgumentParser(
         description=f"""
                           {APPLICATION_NAME_VERSION}!
      Obtains the results amount of complex queries to Github
@@ -21,7 +27,8 @@ def config_args():
                  <esoto@uci.cu>
             <esto.yinyang@gmail.com>
     """,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        fromfile_prefix_chars='@'
     )
 
     args_parser.add_argument('-V', '--version', action='version', version=APPLICATION_NAME_VERSION)
@@ -40,11 +47,11 @@ def config_args():
     file_managing_group = args_parser.add_argument_group(title='file managing',
                                                          description='options to specify input and output files')
 
-    file_managing_group.add_argument('-i', '--input', nargs='+',
-                                     type=argparse.FileType('r'),
+    file_managing_group.add_argument('-i', '--input', nargs='+', action='append',
+                                     type=get_caster_to_optional(Path),
                                      default=[],
-                                     dest='input_files',
-                                     help='input file(s).'
+                                     dest='input_paths',
+                                     help='specify input file(s) or directories.'
                                           ' Each file may contain one or many queries.'
                                           ' The same parser will be used for all the specified files.'
                                           ' This means that the variables in a query will'
@@ -56,17 +63,20 @@ def config_args():
                                           ' is the position of the query in the file.'
                                           ' If queries from the commandline are specified,'
                                           ' those queries will be executed first')
-    file_managing_group.add_argument('-o', '--output-files', action='store_true',
-                                     dest='output_in_files',
-                                     help='specify that each output must be stored in a file.'
-                                          ' Each output file will contain the results of each specified query.'
-                                          ' First files will contain the results of the queries of the'
-                                          ' commandline if any. The name of the files will be in the format'
-                                          f' {QUERY_NAME_FORMAT.format(query_namespace="NAME", i="I")}.'
-                                          f'{OUTPUT_FILE_EXT}'
-                                          f' where NAME is "{COMMANDLINE_NAME}" or the name of some input file'
-                                          ' and I is the corresponding query number of the commandline or the'
-                                          'referenced input file in "name", respectively')
+    file_managing_group.add_argument('-o', '--output', metavar='PATH', type=get_caster_to_optional(Path),
+                                     dest='output_path',
+                                     help='specify that each output must be stored in the specified '
+                                          'file or a directory if PATH ends with "/". '
+                                          'If PATH is a directory then '
+                                          'the output will be in one file per query. '
+                                          'Each output file will contain the results of each specified query. '
+                                          'First files will contain the results of the queries of the '
+                                          'commandline if any. The name of the files will be in the format '
+                                          f'{QUERY_NAME_FORMAT.format(query_namespace="NAME", i="I")}. '
+                                          f'{OUTPUT_FILE_EXT} '
+                                          f'where NAME is "{COMMANDLINE_NAME}" or the name of some input file '
+                                          'and I is the corresponding query number of the commandline or the '
+                                          'referenced input file in "name", respectively.')
 
     file_managing_group.add_argument('--log-file', metavar=('LEVEL', 'FILE'),
                                      nargs=2, action='append', default=[],
@@ -90,7 +100,7 @@ def config_args():
                                            ' When this option is not specified, all the information is '
                                            ' printed to the console')
 
-    console_output_group.add_argument('-v', '--verbose', type=cast_to_verbosity_level_or_none,
+    console_output_group.add_argument('-v', '--verbose', type=get_caster_to_optional(VerbosityLevel.cast_from_name),
                                       choices={None} | set(VerbosityLevel),
                                       default=VerbosityLevel.default(),
                                       dest='verbose',

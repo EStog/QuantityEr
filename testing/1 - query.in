@@ -1,0 +1,18 @@
+[import {
+            [asyncio {
+                @semaphores [{Lock Semaphore BoundedSemaphore} @aq_rel[acquire release]]
+                @event      [Event set wait clear]
+                @condition  [Condition wait notify]
+            }]
+            [multiprocessing {
+                @semaphores_with_rlok {$semaphores [Rlock $aq_rel]}
+                $event
+                $condition
+            }]
+            [threading {
+                [Barrier wait]
+                $semaphores_with_rlok
+                $condition
+                $event
+            }]
+        } language:Python fork:true]

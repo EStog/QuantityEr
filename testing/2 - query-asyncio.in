@@ -1,0 +1,15 @@
+[
+    import
+    @asyncio [
+        asyncio
+        {
+            @semaphores [
+                {Lock Semaphore BoundedSemaphore}
+                @aq_rel[acquire release]
+            ]
+            @event      [Event set wait clear]
+            @condition  [Condition wait notify]
+        }
+    ]
+    language:Python fork:true
+]

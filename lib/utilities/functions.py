@@ -3,15 +3,16 @@ import logging
 import random
 import re
 from logging import Logger
+from pathlib import Path
 from typing import Iterable, Tuple, Type
 
 from lib.config.consts import VERBOSITY_LOGGER_NAME, COLOR, COLOR_EXTRA_KEYWORD, OUTPUT_LOGGER_NAME
 from lib.utilities.enums import ExitCode, VerbosityLevel
 
 
-def critical_error(message: str, exitcode: ExitCode,
-                   logger: Logger = logging.getLogger(VERBOSITY_LOGGER_NAME), error=None):
-    verbose_output(VerbosityLevel.CRITICAL, message, logger, error)
+def critical_error(message: str, exitcode: ExitCode, error=None,
+                   logger: Logger = logging.getLogger(VERBOSITY_LOGGER_NAME)):
+    verbose_output(VerbosityLevel.CRITICAL, message, error, logger)
     logging.shutdown()
     exit(exitcode.value)
 
@@ -21,7 +22,7 @@ def get_tuple_caster(*casters):
         caster = casters[func.i]
         try:
             func.__name__ = caster.__name__
-        except:
+        except AttributeError:
             pass
         func.i += 1
         if func.i == len(casters):
@@ -32,7 +33,7 @@ def get_tuple_caster(*casters):
     return func
 
 
-def get_time_prognostic(n: int, delay, waiting_factor) -> Tuple[str, str]:
+def get_time_prognostic(n: int, delay: int, waiting_factor: int) -> Tuple[str, str]:
     return (str(datetime.timedelta(seconds=n * delay)),
             str(datetime.timedelta(seconds=n * delay * waiting_factor)))
 
@@ -82,21 +83,19 @@ def cast_from_str(value: str, cast_func: type) -> object:
         return casted_value
 
 
-def output(message: str, logger: Logger = logging.getLogger(OUTPUT_LOGGER_NAME),
-           extra=None):
-    if extra is not None:
-        message = f'{message}:\n\t{extra!s}'.expandtabs(4)
-    logger.info(message, extra={COLOR_EXTRA_KEYWORD: COLOR[VerbosityLevel.INFO]})
-
-
-def verbose_output(severity: VerbosityLevel, message: str,
-                   logger: Logger = logging.getLogger(VERBOSITY_LOGGER_NAME),
-                   extra=None):
+def verbose_output(severity: VerbosityLevel, message: str, extra=None,
+                   logger: Logger = logging.getLogger(VERBOSITY_LOGGER_NAME)):
     if extra is not None:
         message = f'{message}:\n\t{extra!s}'.expandtabs(4)
     logger.log(severity.value,
                message,
                extra={COLOR_EXTRA_KEYWORD: COLOR[severity]})
+
+
+def output(message: str, extra=None, logger: Logger = logging.getLogger(OUTPUT_LOGGER_NAME)):
+    if extra is not None:
+        message = f'{message}:\n\t{extra!s}'.expandtabs(4)
+    logger.info(message, extra={COLOR_EXTRA_KEYWORD: COLOR[VerbosityLevel.INFO]})
 
 
 def get_instance(ttype: Type, kwargs: dict):
@@ -117,16 +116,51 @@ def normalize_name(name):
     return re.sub(r'([a-z0-9_]|^)([A-Z])', repl, name)
 
 
-def cast_to_verbosity_level_or_none(level):
-    if level == 'None':
-        return None
-    else:
-        return VerbosityLevel.cast_from_name(level)
+def get_caster_to_optional(ttype):
+    def f(value: str):
+        if not value:
+            return value
+        else:
+            return ttype(value)
 
+    return f
+
+
+def div(a: int, b: int):
+    return a / b if b != 0 else 0
+
+
+def create_path(path: Path):
+    """
+    Returns True if path is a file, else returns False.
+    Creates the path if it does not exists
+    """
+    if not path.exists():
+        try:
+            path.touch()
+            return True
+        except FileNotFoundError:
+            try:
+                path.mkdir(parents=True)
+                return False
+            except OSError as e:
+                critical_error(f'Cannot create directory {path} for output',
+                               ExitCode.FILE_ERROR, error=e)
+    else:
+        return path.is_file()
+
+
+def open_file(path: Path, mode: str):
+    try:
+        file = path.open(mode)
+    except OSError as e:
+        critical_error(f'Cannot open file {path.name}', ExitCode.FILE_ERROR, error=e)
+    else:
+        return file
 
 __all__ = ['critical_error', 'get_tuple_caster',
            'output', 'verbose_output', 'cast_tuple_from_str',
-           'get_instance', 'normalize_name',
+           'get_instance', 'normalize_name', 'div',
            'get_included_excluded_principle_iter_amount',
-           'cast_to_verbosity_level_or_none',
+           'get_caster_to_optional', 'create_path',
            'get_waiting_time', 'get_time_prognostic']

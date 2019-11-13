@@ -1,90 +1,13 @@
 import string
-from abc import abstractmethod
-from typing import TextIO
+from typing import Mapping
 
-from sympy import SympifyError, simplify_logic
-from sympy.logic.boolalg import to_dnf
-
-from lib.config.consts import QUERY_NAME_FORMAT, COMMANDLINE_NAME, QUOTE_FORMAT
-from lib.utilities.classes import WithDefaults, Firm
-from lib.utilities.enums import XEnum, ExitCode, VerbosityLevel
-from lib.utilities.flip_dict import Flipdict
-from lib.utilities.functions import critical_error, normalize_name
+from lib.internal_logic.parsers.parser import Parser
+from lib.utilities.bi_dict import BiDict
+from lib.utilities.classes import Argument
+from lib.utilities.functions import normalize_name
 
 
-class Parser(WithDefaults):
-    """Abstract base class for parser"""
-
-    class Code:
-        def __init__(self, stream: TextIO):
-            self.__stream = stream
-            self.current_pos = 0
-            self.current_line = 1
-            self.current_char = ''
-            self.next()
-
-        def next(self):
-            self.current_char = self.__stream.read(1)
-            self.current_pos += 1
-            if self.current_char == '\n':
-                self.current_line += 1
-                self.current_pos = 0
-
-        def consume_leading_spaces(self):
-            while self.current_char.isspace():
-                self.next()
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._query_namespace = COMMANDLINE_NAME
-        self._current_query_number = 0
-        self.names = {}
-        self.associations = Flipdict()
-
-    def set_namespace(self, query_namespace: str):
-        self._query_namespace = query_namespace
-        self._current_query_number = 0
-
-    def get_symbolic_expression(self, code: TextIO, only_one_query: bool = False) -> str:
-        code = self.Code(code)
-        code.consume_leading_spaces()
-        while code.current_char:
-            self._current_query_number += 1
-            query_name = QUERY_NAME_FORMAT.format(
-                query_namespace=self._query_namespace,
-                i=self._current_query_number
-            )
-            self._verbose_output(VerbosityLevel.INFO, f'Parsing query {QUOTE_FORMAT.format(query_name)} ...')
-            exp = self._parse_expression(code, '')
-            self._verbose_output(VerbosityLevel.INFO, f'Query {QUOTE_FORMAT.format(query_name)} parsed')
-            try:
-                self._verbose_output(VerbosityLevel.DEBUG, f'Converting {QUOTE_FORMAT.format(query_name)} to DNF ...')
-                exp = simplify_logic(exp)
-                exp = str(to_dnf(exp))
-                self._verbose_output(VerbosityLevel.DEBUG, f'Query {QUOTE_FORMAT.format(query_name)} converted to DNF')
-                yield query_name, exp
-            except SympifyError as e:
-                self._critical_error(code,
-                                     f'Can not convert to boolean expression query {QUOTE_FORMAT.format(query_name)}.\n'
-                                     f'Sympify error', e)
-            if not code.current_char.isspace():
-                self._critical_error(code, f'Extra characters in query {QUOTE_FORMAT.format(query_name)}')
-            code.consume_leading_spaces()
-            if only_one_query and code.current_char:
-                self._critical_error(code, f'Extra characters in the query {QUOTE_FORMAT.format(query_name)}')
-
-    @abstractmethod
-    def _parse_expression(self, code: Code, exp: str) -> str:
-        """Parse an expression"""
-        pass
-
-    def _critical_error(self, code: Code, message: str, error=None):
-        """This method is used when a critical error is found. It just log the error and exit the application"""
-        critical_error(f'Parsing error in {code.current_line}:{code.current_pos}:\n\t{message}',
-                       ExitCode.PARSING, self._logger, error)
-
-
-class Brackets_SyntaxParser(Parser):
+class BracketsSyntaxParser(Parser):
     """
     This parser implements the following grammar:
 
@@ -119,11 +42,17 @@ class Brackets_SyntaxParser(Parser):
     DISJUNCTION_END = '}'
     NEGATION_OP = "~"
 
-    class _KW(XEnum):
-        ALLOW_REDEFINE_IDS = Firm(bool, True)
+    def _init_parameters(self):
+        self._allow_redefine_ids = Argument(type=bool, default=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._names = {}
+        self._literals_table = BiDict()
+
+    @property
+    def symbols_table(self) -> Mapping[str, str]:
+        return self._literals_table
 
     def _parse_expression(self, code: Parser.Code, exp: str) -> str:
         """
@@ -189,26 +118,26 @@ class Brackets_SyntaxParser(Parser):
         """<named_expression> ::=  REFERENT_DEFINITION <expression>"""
         code.next()
         nm = self._match_id(code)
-        if nm in self.names and not self._get(self._KW.ALLOW_REDEFINE_IDS):
+        if nm in self._names and not self._allow_redefine_ids:
             self._critical_error(code, f'Identifier "{nm}" has been already defined')
         sub_exp = self._parse_expression(code, '')
-        self.names[nm] = sub_exp
+        self._names[nm] = sub_exp
         exp += f' {sub_exp}'
         return exp
 
     def _parse_expression_reference(self, code: Parser.Code, exp: str) -> str:
         code.next()
         nm = self._match_id(code)
-        if nm not in self.names:
+        if nm not in self._names:
             self._critical_error(code, f'Identifier "{nm}" has not been defined before')
-        exp += f' {self.names[nm]}'
+        exp += f' {self._names[nm]}'
         return exp
 
     def _parse_literal(self, code: Parser.Code, exp: str) -> str:
         literal = self._match_literal(code)
-        if literal not in self.associations.flip:
-            self.associations[f'v{len(self.associations)}'] = literal
-        exp += f' {self.associations.flip[literal]}'
+        if literal not in self._literals_table.sym:
+            self._literals_table[f'v{len(self._literals_table)}'] = literal
+        exp += f' {self._literals_table.sym[literal]}'
         return exp
 
     def _match_id(self, code: Parser.Code) -> str:
@@ -260,12 +189,6 @@ class Brackets_SyntaxParser(Parser):
         return literal
 
 
-Brackets_SyntaxParser.__name__ = normalize_name(Brackets_SyntaxParser.__name__)
+BracketsSyntaxParser.__name__ = normalize_name(BracketsSyntaxParser.__name__)
 
-
-class SyntaxType(XEnum):
-    BRACKETS = Brackets_SyntaxParser
-    DEFAULT = BRACKETS
-
-
-__all__ = ['Parser', 'SyntaxType']
+__all__ = ['BracketsSyntaxParser']

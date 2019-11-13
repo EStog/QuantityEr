@@ -1,0 +1,13 @@
+[
+    import
+    [
+        multiprocessing
+        {
+            @semaphores_with_rlok {$semaphores [Rlock $aq_rel]}
+            $event
+            $condition
+        }
+    ]
+    language:Python
+    fork:true
+]

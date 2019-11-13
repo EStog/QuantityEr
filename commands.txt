@@ -1,0 +1,1 @@
+-p -i ./testing/ -o ./testing -v info -E user 626b86cd521ee06111476281b98c9aae488c18cc -X allow_redefine_ids True -c shelf --log-file debug ./testing/debug.log
