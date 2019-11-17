@@ -1,0 +1,4641 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass paper
+\begin_preamble
+
+\end_preamble
+\use_default_options true
+\begin_modules
+theorems-ams-bytype
+lyxNotebookCellBash
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen true
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\pdf_quoted_options "citecolor=cyan, linkcolor=cyan"
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine biblatex
+\cite_engine_type numerical
+\biblio_style plainnat
+\biblio_options backref=true
+\biblatex_bibstyle numeric-comp
+\biblatex_citestyle numeric-comp
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\rightmargin 3cm
+\bottommargin 1.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+QuantityEr: An extensible and simple solution to obtain the amount of results
+ of complex queries to GitHub
+\end_layout
+
+\begin_layout Date
+November, 2019
+\end_layout
+
+\begin_layout Author
+Ernesto Soto Gómez
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+email: esoto@uci.cu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Institution
+
+\lang spanish
+Departamento de Inteligencia Computacional,
+\begin_inset Newline newline
+\end_inset
+
+Facultad 1,
+\begin_inset Newline newline
+\end_inset
+
+Universidad de las Ciencias Informáticas
+\end_layout
+
+\begin_layout Abstract
+
+\lang spanish
+GitHub es una plataforma que proporciona alojamiento para el control de
+ versiones de desarrollo de software utilizando Git.
+ Cuenta con una interfaz de programación de aplicaciones para permitir que
+ el software interactúe con la plataforma.
+ La enorme cantidad de información alojada en GitHub puede ser útil para
+ realizar estudios sobre la presencia actual de herramientas de desarrollo
+ en la comunidad de desarrollo de software de código abierto.
+ Sin embargo, el motor de búsqueda posee restricciones que hacen imposible
+ emitir consultas complejas a la plataforma.
+ En este informe, se describe una solución extensible y orientada a objetos,
+ llamada QuantityEr, para obtener la cantidad de resultados de búsqueda
+ de consultas complejas a GitHub utilizando el principio de inclusión-exclusión.
+ Se presentan las definiciones matemáticas y los conceptos relacionados.
+ Se discute el modelo matemático.
+ Se presentan el diseño general de la aplicación y las herramientas de desarroll
+o utilizadas.
+ Además, son mostrados resultados de ejemplos de ejecución.
+ Se concluye que el problema tratado ha sido resuelto aunque se puede trabajar
+ para mejorar la solución.
+\end_layout
+
+\begin_layout Keywords
+
+\lang spanish
+GitHub, cantidad de resultados de búsqueda, principio de inclusión y exclusión,
+ programación orientada a objetos, Python
+\end_layout
+
+\begin_layout Abstract
+GitHub is a platform that provides hosting for software development version
+ control using Git.
+ It features an application programming interface to allow software to interact
+ with the platform.
+ The enormous quantity of information Hosted in GitHub may be useful to
+ make studies about the current presence of development tools in the open
+ source software development community.
+ However the search engine have restrictions that make impossible to issue
+ complex queries to the platform.
+ In this report, it is described an object oriented and extensible solution,
+ named QuantityEr, to obtain the amount of search results of complex queries
+ to GitHub by using the inclusion-exclusion principle.
+ The mathematical definitions as well as related concepts are presented.
+ The mathematical model is discussed.
+ The application general design and used development tools are presented.
+ Also, results of execution examples are showed.
+ It is concluded that the treated problem have been solved although more
+ work may to be done to improve the solution.
+\end_layout
+
+\begin_layout Keywords
+GitHub, search results amount, inclusion-exclusion principle, object oriented
+ programming, Python
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+GitHub
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ is a platform that provides hosting for software development version control
+ using Git
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://git-scm.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ It provides several collaboration features such as bug tracking, feature
+ requests, task management, and wikis for every project.
+ It also features an application programming interface (API) to allow software
+ to interact with the platform
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.github.com/v3
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dawson2016building"
+literal "true"
+
+\end_inset
+
+.
+ Through this API a search engine can be accessed.
+ The search engine allows users to find almost every single aspect across
+ several projects, source codes and other areas and features of the platform
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fn:search-api"
+
+\end_inset
+
+
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.github.com/v3/search/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dawson2016pythonand"
+literal "true"
+
+\end_inset
+
+.
+ A web page that serves as an interface to the search API is also available
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/search
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+As of August 2019, GitHub reports having over 40 million users and more
+ than 100 million repositories
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/about
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ This enormous quantity of information may be useful, among other things,
+ to obtain the number of projects, source codes, issues, etc, that mention
+ a set of technologies, tools, development libraries, etc, in order to make
+ studies about the current presence of this tools in the open source software
+ development community.
+ Other kind of quantitative studies may be done as well .
+ Examples of those kind of research are 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "beller2016analyzing"
+literal "true"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+However the search engine have some restrictions
+\begin_inset Formula $^{\ref{fn:search-api}}$
+\end_inset
+
+ that make impossible to issue complex queries to the platform.
+ According to the GitHub Developer Guide
+\begin_inset Formula $^{\ref{fn:search-api}}$
+\end_inset
+
+, the restrictions are the following:
+\end_layout
+
+\begin_layout Itemize
+The Search API does not support queries that:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+are longer than 256 characters (not including operators or qualifiers).
+\end_layout
+
+\begin_layout Itemize
+have more than five AND, OR, or NOT operators.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+For authenticated requests can be made up to 30 requests per minute.
+ For unauthenticated requests, the rate limit allows to make up to 10 requests
+ per minute.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Also, a quick test reveals that the search API does not perform well when
+ queries have nested expressions.
+\end_layout
+
+\end_inset
+
+ Furthermore, if the search is over source code files, especial restrictions
+ apply
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://developer.github.com/v3/search/
+\backslash
+#search-code
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A system have been already developed to ease the interaction with the large
+ quantity of information hosted in GitHub
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ghtorrent.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "gousios2014leanghtorrent"
+literal "true"
+
+\end_inset
+
+.
+ This solution is mainly conceived to mirror the data hosted in GitHub in
+ order to facilitate parallel access and studies on snapshots of the data,
+ but does not provide an alternative to making complex queries to GitHub.
+ In fact, this system has its own restrictions on the quantity of data that
+ can be accessed at any time
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ghtorrent.org/raw.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ghtorrent.org/mysql.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ Also, the system only provides snapshots for a reduced set of projects
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ghtorrent.org/mongo.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ghtorrent.org/relational.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ Moreover, its design is centered only on the interaction with the repositories
+ of GitHub.
+ This means, for example, that search on source code is not allowed.
+ Furthermore, the objective of the system is to interact with GitHub, which
+ means that a future interaction with other platforms is not currently conceived.
+\end_layout
+
+\begin_layout Standard
+In the context or this article, complex queries are those that have many
+ logical connectives and sub-expressions –for example: 
+\family typewriter
+A OR (C AND (D OR E))
+\family default
+– specially those that exceed the allowed number of logical operators.
+ By getting the results amount of queries of this kind, analysis about the
+ current presence of technologies might be done.
+ But currently, this is not possible in an automatic way.
+\end_layout
+
+\begin_layout Standard
+In this report, it is described a simple solution, named QuantityEr, to
+ obtain the search results amount of complex queries to GitHub.
+ The proposed design was conceive with the aim of extension in mind, in
+ such a way that it would be possible to incorporate the ability to interact
+ with other similar platforms besides GitHub as well as other queries languages
+ and algorithms for obtaining the amount of search results.
+\end_layout
+
+\begin_layout Standard
+The current document is structured in the following manner.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Mathematical-background"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ exposes some mathematical definitions and concepts necessary to understand
+ the proposed solution.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Solution-description"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ describes the proposed solution as well as some usage examples.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Conclusions"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ makes the final remarks and conclude.
+ There is also an appendix (section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Appendix"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) with some extra information that can be consulted.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Mathematical-background"
+
+\end_inset
+
+Mathematical background
+\end_layout
+
+\begin_layout Standard
+In order to understand the proposed solution, some mathematical background
+ is necessary.
+ To archive a self-contained report, in this section is mentioned the principal
+ mathematical concepts used in the design of the solution.
+ The following definitions (or equivalent ones) as well of other complementary
+ concepts and profs can be found in the cited references 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "grossman2018functions,grossman2018propositional,grossman2018settheory,johnsonbaugh2017boolean,johnsonbaugh2017setsand,michaels2018boolean,rieper2018inclusionexclusion,rosen2019boolean,rosen2019inclusiontextendashexclusion"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The following notations will be used in this report.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\wp(A)$
+\end_inset
+
+ denotes the power set of a set 
+\begin_inset Formula $A$
+\end_inset
+
+, that is the set of all subsets of 
+\begin_inset Formula $A$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $|A|$
+\end_inset
+
+ denotes the cardinality of a set 
+\begin_inset Formula $A$
+\end_inset
+
+, that is the number of elements in 
+\begin_inset Formula $A$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\varnothing$
+\end_inset
+
+ denotes the empty set.
+\end_layout
+
+\begin_layout Subsection
+Boolean algebras
+\end_layout
+
+\begin_layout Standard
+The first essential concept important to the design of the proposed solution
+ is that of Boolean algebra.
+\end_layout
+
+\begin_layout Definition
+\begin_inset CommandInset label
+LatexCommand label
+name "def:Boolean-algebra"
+
+\end_inset
+
+A Boolean algebra is a tuple 
+\begin_inset Formula $(S,+,\text{·},',\bot,\top)$
+\end_inset
+
+ where 
+\begin_inset Formula $S$
+\end_inset
+
+ is a set containing distinct elements 
+\begin_inset Formula $\bot$
+\end_inset
+
+ and 
+\begin_inset Formula $\top$
+\end_inset
+
+, 
+\begin_inset Formula $+$
+\end_inset
+
+ and 
+\begin_inset Formula $·$
+\end_inset
+
+ are binary operators on 
+\begin_inset Formula $S$
+\end_inset
+
+ and 
+\begin_inset Formula $'$
+\end_inset
+
+ is a unary operator on 
+\begin_inset Formula $S$
+\end_inset
+
+.
+ Every Boolean algebra satisfies the following laws for all 
+\begin_inset Formula $x,y,z\in S$
+\end_inset
+
+.
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features booktabs="true" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="5cm">
+<column alignment="left" valignment="top" width="5cm">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Commutative laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+y=y+x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\text{·}y=y\text{·}x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Distributive laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x·(y+z)=(x·y)+(x·z)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+(y\text{·}z)=(x+y)\text{·}(x+z)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Identity laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+\bot=x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x·\top=x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Complement laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+x'=\top$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x·x'=\bot$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Associative and idempotent laws, as well as other laws can be also considered
+ since they follow from the definition laws.
+ Furthermore, other useful operators can be derived from the previous ones
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "johnsonbaugh2017boolean,michaels2018boolean,rosen2019boolean"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Fact
+\begin_inset CommandInset label
+LatexCommand label
+name "fact:boolean-algebra-laws"
+
+\end_inset
+
+In a Boolean algebra 
+\begin_inset Formula $(S,+,\text{·},',\bot,\top)$
+\end_inset
+
+ the following laws are satisfied for all 
+\begin_inset Formula $x,y,z\in S$
+\end_inset
+
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="3">
+<features booktabs="true" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="5cm">
+<column alignment="left" valignment="top" width="5cm">
+<column alignment="left" valignment="top">
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Associative laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+(y+z)=(x+y)+z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\cdot(y\cdot z)=(x\cdot y)\cdot z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Idempotent laws:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x+x=x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $x\cdot x=x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Boolean algebras are used to model operations over the elements of a set
+ that relates two elements with the maximum (
+\begin_inset Formula $+$
+\end_inset
+
+ operation) or the minimum (
+\begin_inset Formula $\cdot$
+\end_inset
+
+ operation) of both elements in a partial order where the minimum and the
+ maximum are 
+\begin_inset Formula $\bot$
+\end_inset
+
+ and 
+\begin_inset Formula $\top$
+\end_inset
+
+, respectively.
+ In other words, a partial order 
+\begin_inset Formula $\leq$
+\end_inset
+
+ can be defined over 
+\begin_inset Formula $S$
+\end_inset
+
+ where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\forall a,b\in S\,\big(a\leq b\iff a+b=b\big)
+\]
+
+\end_inset
+
+or equivalently 
+\begin_inset Formula 
+\[
+\forall a,b\in S\,\big(a\leq b\iff a\cdot b=a\big)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and 
+\begin_inset Formula 
+\[
+\forall a\in S\,\big(\bot\leq a\leq\top\big)
+\]
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "michaels2018boolean"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Also, intuitively speaking, all the elements have an associated complement
+ counterpart that together form the maximum but apart form the minimum as
+ stated in the complement laws.
+\end_layout
+
+\begin_layout Fact
+The tuple 
+\begin_inset Formula $\big(\left\{ 0,1\right\} ,\lor,\land,\neg,0,1\big)$
+\end_inset
+
+ is a Boolean algebra with the operations of disjunction (
+\begin_inset Formula $\lor$
+\end_inset
+
+), conjunction (
+\begin_inset Formula $\land$
+\end_inset
+
+) and negation (
+\begin_inset Formula $\neg$
+\end_inset
+
+) defined as follow.
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\lor$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\land$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset Formula $x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\neg x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+This is the most elemental Boolean algebra and is the one found in classical
+ binary logic that has applications in several areas of computer sciences
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "michaels2018boolean,johnsonbaugh2017boolean,johnsonbaugh2017setsand,grossman2018propositional"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Fact
+\begin_inset CommandInset label
+LatexCommand label
+name "fact:power-set-Boolean-algebra"
+
+\end_inset
+
+The tuple 
+\begin_inset Formula $\big(\wp\left(U\right),\cup,\cap,{}^{\mathrm{C}},\varnothing,U\big)$
+\end_inset
+
+ is a Boolean algebra with the operation of union (
+\begin_inset Formula $\cup$
+\end_inset
+
+), intersection (
+\begin_inset Formula $\cap$
+\end_inset
+
+) and complement (
+\begin_inset Formula $^{\mathrm{C}}$
+\end_inset
+
+) defined as follows for all 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $X,Y\in\wp(U)$
+\end_inset
+
+.
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $X\cup Y=\big\{ x\mid x\in X\lor x\in Y\big\}$
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Formula $X\cap Y=\big\{ x\mid x\in X\land x\in Y\big\}$
+\end_inset
+
+ 
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Formula $X^{\mathrm{C}}=\big\{ x\mid x\notin X\big\}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This specific Boolean algebra is of great interest in science since mathematics
+ in general are founded in set theory 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "michaels2018boolean,johnsonbaugh2017boolean,johnsonbaugh2017setsand,grossman2018settheory"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In this specific work, the last two described Boolean algebras are crucial
+ because the current problem is to find the number of objects that makes
+ true a logical sentence.
+ In this context, the logical sentence is the query to be issue to the platform.
+ The proposed solution takes advantage of the equivalences between classical
+ logic and set theory in the context of Boolean algebras to solve this problem.
+\end_layout
+
+\begin_layout Subsection
+Boolean functions
+\end_layout
+
+\begin_layout Standard
+In some contexts, the combination of operations in the set 
+\begin_inset Formula $\{0,1\}$
+\end_inset
+
+ are called Boolean functions.
+ The following definitions relate to this subject.
+\end_layout
+
+\begin_layout Definition
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Boolean function
+\end_layout
+
+\end_inset
+
+A Boolean function of degree 
+\begin_inset Formula $n$
+\end_inset
+
+ is a function 
+\begin_inset Formula $f\colon\left\{ 0,1\right\} ^{n}\to\left\{ 0,1\right\} $
+\end_inset
+
+ where 
+\begin_inset Formula $f$
+\end_inset
+
+ is an atom (a single variable or value) or a composition of the operations
+ 
+\begin_inset Formula $\land$
+\end_inset
+
+, 
+\begin_inset Formula $\lor$
+\end_inset
+
+ and 
+\begin_inset Formula $\neg$
+\end_inset
+
+ of the Boolean algebra 
+\begin_inset Formula $\big(\left\{ 0,1\right\} ,\lor,\land,\neg,0,1\big)$
+\end_inset
+
+.
+ This composition is called a Boolean expression, and the variables of the
+ Boolean expression are called Boolean variables.
+\end_layout
+
+\begin_layout Standard
+This concept has wide application in logic gates circuits design.
+ In this topic one of the main problems is the simplification of Boolean
+ expressions 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "michaels2018boolean,johnsonbaugh2017boolean,rosen2019boolean,grossman2018functions"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the case of this work, these are of great importance because, as we will
+ see, each query have an associated Boolean expression.
+ The objective is to simplify it in order to obtain an expression that involves
+ less computation.
+\end_layout
+
+\begin_layout Standard
+The simplification of a Boolean expressions may be done symbolically by
+ applying the laws of a Boolean algebra (definition 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "def:Boolean-algebra"
+
+\end_inset
+
+) but also by applying specific methods that simplify an equivalent form
+ of the expression.
+\end_layout
+
+\begin_layout Definition
+Two Boolean expressions 
+\begin_inset Formula $A\left(x_{1},x_{2}\ldots,x_{n}\right)$
+\end_inset
+
+ and 
+\begin_inset Formula $B\left(x_{1},x_{2},\ldots,x_{n}\right)$
+\end_inset
+
+ are equivalent if 
+\begin_inset Formula $\forall x_{1},x_{2},\dots,x_{n}\in\{0,1\}\,\Big(A\left(x_{1},x_{2},\ldots,x_{n}\right)=B\left(x_{1},x_{2},\dots,x_{n}\right)\Big)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Definition
+A normal form of a Boolean expression 
+\begin_inset Formula $f(x_{1},x_{2},\ldots,x_{n})$
+\end_inset
+
+ is an equivalent Boolean expression in the form 
+\begin_inset Formula $g(x_{1},x_{2},\ldots,x_{n})=t_{1}\ast t_{2}*,\ldots,*t_{m}$
+\end_inset
+
+ where each 
+\begin_inset Formula $t_{1\leq i\leq m}$
+\end_inset
+
+ is in the form 
+\begin_inset Formula $y_{1}\star y_{2}\star,\ldots,\star y_{k\leq n}$
+\end_inset
+
+ and each 
+\begin_inset Formula $y_{1\leq j\leq k}$
+\end_inset
+
+ is in the form 
+\begin_inset Formula $x_{k}$
+\end_inset
+
+ or 
+\begin_inset Formula $\neg x_{k}$
+\end_inset
+
+ where 
+\begin_inset Formula $1\leq k\leq n$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Definition
+When 
+\begin_inset Formula $*$
+\end_inset
+
+ is 
+\begin_inset Formula $\land$
+\end_inset
+
+ and 
+\begin_inset Formula $\star$
+\end_inset
+
+ is 
+\begin_inset Formula $\lor$
+\end_inset
+
+ the normal form is called conjunctive (CNF).
+ Similarly, when 
+\begin_inset Formula $*$
+\end_inset
+
+ is 
+\begin_inset Formula $\lor$
+\end_inset
+
+ and 
+\begin_inset Formula $\star$
+\end_inset
+
+ is 
+\begin_inset Formula $\land$
+\end_inset
+
+ the normal form is called disjunctive (DNF).
+ Additionally, when the normal form is conjunctive each 
+\begin_inset Formula $t_{1\leq i\leq m}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ is called a maxterm.
+ Similarly, when the normal form is disjunctive each 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\xout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $t_{1\leq i\leq m}$
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ is called a minterm.
+\end_layout
+
+\begin_layout Standard
+The Quine-McCluskey algorithm is one of such methods that uses the normal
+ form of a Boolean expression, specifically DNF, to obtain an equivalent
+ minimal expression.
+ The algorithm, in essence, test combinations of the minterms in order to
+ find those that are essential to represent the value of the expression.
+ It is known that it does not performance well when the size of the input,
+ in this case the expression to simplify, is big.
+ In fact, the problem of simplification of Boolean expressions is considered
+ NP-hard 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "rosen2019boolean,michaels2018boolean,johnsonbaugh2017boolean"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+However, the simplification of a Boolean expression is steel of great importance
+ to this work, because small queries are preferable to big ones.
+\end_layout
+
+\begin_layout Definition
+Let 
+\begin_inset Formula $X_{1},X_{2},\ldots,X_{n}$
+\end_inset
+
+ be given sets.
+ A predicate is a function 
+\begin_inset Formula $P\colon X_{1}\times X_{2}\times,\ldots,X_{n}\to\{0,1\}$
+\end_inset
+
+.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "grossman2018propositional,johnsonbaugh2017setsand"
+literal "true"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It obvious that a predicate has an associated Boolean expression if each
+ atom is replaced by a Boolean variable.
+\end_layout
+
+\begin_layout Definition
+\begin_inset CommandInset label
+LatexCommand label
+name "def:set-compression"
+
+\end_inset
+
+The expression 
+\begin_inset Formula $S=\big\{ x\mid P(x)\big\}$
+\end_inset
+
+ is equivalent to 
+\begin_inset Formula $x\in S\iff P(x)$
+\end_inset
+
+.
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "grossman2018settheory"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following theorem will be useful in the modeling of the solution.
+\end_layout
+
+\begin_layout Theorem
+\begin_inset CommandInset label
+LatexCommand label
+name "theorem:predicates-sets"
+
+\end_inset
+
+The following relations are satisfied for any 
+\begin_inset Formula $A=\big\{ x\mid P(x)\big\}$
+\end_inset
+
+ and 
+\begin_inset Formula $B=\big\{ x\mid Q(x)\big\}$
+\end_inset
+
+:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(a)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A\cup B=\big\{ x\mid P(x)\lor Q(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(b)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A\cap B=\big\{ x\mid P(x)\land Q(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(c)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A^{\mathrm{C}}=\big\{ x\mid\neg P(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Proof
+Appendix section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "subsec:Theorem predicates-sets"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+This relations may be easily understood, since if 
+\begin_inset Formula $A$
+\end_inset
+
+ contains all the elements 
+\begin_inset Formula $x$
+\end_inset
+
+ such that 
+\begin_inset Formula $P(x)=1$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+ is all the elements 
+\begin_inset Formula $x$
+\end_inset
+
+ such that 
+\begin_inset Formula $Q(x)=1$
+\end_inset
+
+ then it follows –from the definition 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "def:set-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and the definition of union in the fact 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fact:power-set-Boolean-algebra"
+
+\end_inset
+
+– that 
+\begin_inset Formula $A\cup B$
+\end_inset
+
+ will have the elements 
+\begin_inset Formula $x$
+\end_inset
+
+ such that 
+\begin_inset Formula $P(x)\lor Q(x)=1$
+\end_inset
+
+.
+ The same analysis can be done for the intersection and complement cases.
+\end_layout
+
+\begin_layout Subsection
+Inclusion-exclusion principle
+\end_layout
+
+\begin_layout Standard
+First let consider the cardinality of the power set.
+ This will be useful later in the description of the proposed solution.
+\end_layout
+
+\begin_layout Fact
+\begin_inset CommandInset label
+LatexCommand label
+name "The-cardinality-of-power-set"
+
+\end_inset
+
+The cardinality of the power set of 
+\begin_inset Formula $U$
+\end_inset
+
+ is
+\begin_inset Formula 
+\[
+\big|\wp(U)\big|=2^{|U|}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "johnsonbaugh2017setsand"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The inclusion-exclusion principle (IEP) is a mathematical formula that can
+ be used to obtain the cardinality of the union of finite sets taking into
+ account the cardinality of all possible intersections of the given sets.
+\end_layout
+
+\begin_layout Fact
+\begin_inset CommandInset label
+LatexCommand label
+name "fact:inclusion-exclusion"
+
+\end_inset
+
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+Inclusion-exclusion principle
+\end_layout
+
+\end_inset
+
+The cardinality of the union of sets 
+\begin_inset Formula $S_{i\in\{1,2,\ldots,n\}}$
+\end_inset
+
+ is
+\end_layout
+
+\begin_layout Fact
+\begin_inset Formula 
+\[
+\Bigg|\bigcup_{i=1}^{n}S_{i}\Bigg|=\sum_{\varnothing\neq J\in\{1,2,\ldots,n\}}(-1)^{|J|+1}\Bigg|\bigcap_{j\in J}A_{j}\Bigg|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The number of every possible intersection of 
+\begin_inset Formula $n$
+\end_inset
+
+ sets is the same that the number of subsets of a set of 
+\begin_inset Formula $n$
+\end_inset
+
+ elements without counting the empty set.
+ This leads to the following fact tanking into account fact 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "The-cardinality-of-power-set"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Fact
+\begin_inset CommandInset label
+LatexCommand label
+name "fact:amount-terms-inclusion-exclusion"
+
+\end_inset
+
+There are
+\begin_inset Formula 
+\[
+2^{n}-1
+\]
+
+\end_inset
+
+terms in the inclusion-exclusion principle formula for 
+\begin_inset Formula $n$
+\end_inset
+
+ sets.
+\end_layout
+
+\begin_layout Standard
+This means that an algorithm that calculates the cardinality of the union
+ of 
+\begin_inset Formula $n$
+\end_inset
+
+ sets by directly using the IEP have an exponential complexity 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "rieper2018inclusionexclusion,rosen2019inclusiontextendashexclusion"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In the proposed solution the IEP is used to decompose a given query in many
+ smaller sub-queries that will be issued to the platform search API.
+ In the next section, will be shown how to manage the problem of the exponential
+ complexity when using this method.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Solution-description"
+
+\end_inset
+
+Solution description
+\end_layout
+
+\begin_layout Standard
+The problem to solve is: ¿How to get the results amount of complex queries
+ to GitHub?
+\end_layout
+
+\begin_layout Standard
+The proposed solution follows a divide and conquer approach as follows:
+\end_layout
+
+\begin_layout Enumerate
+Simplify and decompose complex queries into smaller simple sub-queries.
+\end_layout
+
+\begin_layout Enumerate
+Issue the sub-queries to the server and obtain the results amount of each
+ one.
+\end_layout
+
+\begin_layout Enumerate
+Sum up the results of the sub-queries into one that constitutes the results
+ amount of the initial complex query.
+\end_layout
+
+\begin_layout Standard
+In the next subsection a mathematical model and formalization of the solution
+ is given.
+\end_layout
+
+\begin_layout Subsection
+Mathematical model
+\end_layout
+
+\begin_layout Standard
+Mathematically speaking, the problem to solve is as follows.
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $O$
+\end_inset
+
+ be the set of all the objects in the platform (projects, source codes,
+ etc).
+ Let 
+\begin_inset Formula $Q\colon O\to\{0,1\}$
+\end_inset
+
+ be a predicate that represents the query to issue.
+ Then, the set 
+\begin_inset Formula $r_{Q}$
+\end_inset
+
+ of all objects that match the query 
+\begin_inset Formula $Q$
+\end_inset
+
+ is
+\begin_inset Formula 
+\[
+r_{Q}=\big\{ o\mid Q(o)\big\}
+\]
+
+\end_inset
+
+ The problem to solve is finding 
+\begin_inset Formula $\big|r_{Q}\big|$
+\end_inset
+
+ when the associated Boolean expression given by 
+\begin_inset Formula $Q$
+\end_inset
+
+ has many compositions and logical connectives.
+\end_layout
+
+\begin_layout Standard
+The first step of the proposed solution is to simplify the Boolean expression
+ associated to the query.
+ This may be done by symbolic transformations applying the laws that a Boolean
+ algebra satisfies or also by using the Quine-McCluskey algorithm.
+ It is known that this solution is not effective when the size of the input
+ is to big.
+ For this reason the resultant expression (simplified or not) must be decomposed
+ into various sub-expressions.
+ For this purpose the DNF expression is used.
+ By applying theorem 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "theorem:predicates-sets"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ it is known that if 
+\begin_inset Formula $Q(o)=Q_{1}(o)\lor Q_{2}(o)\lor\ldots\lor Q_{n}(o)$
+\end_inset
+
+ is the DNF then
+\begin_inset Formula 
+\[
+r_{Q}=\Big\{ o\mid Q_{1}(o)\lor Q_{2}(o)\lor,\ldots,\lor Q_{n}(o)\Big\}=r_{Q_{1}}\cup r_{Q_{2}}\cup\ldots\cup r_{Q_{n}}
+\]
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+r_{Q_{i}}=\Big\{ o\mid Q_{i}(o)\Big\}
+\]
+
+\end_inset
+
+for each 
+\begin_inset Formula $1\leq i\leq n$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Each 
+\begin_inset Formula $Q_{i}(o)$
+\end_inset
+
+ is in the form 
+\begin_inset Formula $Q_{i_{1}}(o)\land Q_{i_{2}}(o)\land\ldots\land Q_{i_{m}}(o)$
+\end_inset
+
+.
+ This kind of query can be issued directly to GitHub because it does not
+ have composition and only have conjunctive connectives.
+ The conjunctives connectives (AND in the query language of GitHub) can
+ be stripped of the sub-query since GitHub automatically interprets a tuple
+ of atoms as a conjunction.
+ In this case the is no use of conjunctive or disjunctive connectives in
+ the query.
+ Nevertheless, the case of the negation is a problem that, for now, can
+ not be avoided.
+ So in this case, a query must be designed with care in order not to exceed
+ the restriction that GitHub Search API imposes in the number of operators.
+\end_layout
+
+\begin_layout Standard
+After the sub-queries have been sent, the next step is to find the results
+ amount of the main query by applying IEP (fact 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fact:inclusion-exclusion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The problem with this approach is that the number of terms –according to
+ fact 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fact:amount-terms-inclusion-exclusion"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+– in IEP formula with 
+\begin_inset Formula $n$
+\end_inset
+
+ sets is 
+\begin_inset Formula $2^{n}-1$
+\end_inset
+
+, which is the number of sub-queries to be issued to the server.
+\end_layout
+
+\begin_layout Standard
+However, each term in IEP is of the form of a intersection.
+ Moreover, the terms in the expression associated to the DNF are also in
+ the form of intersection.
+ Then, by applying fact 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fact:boolean-algebra-laws"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, that it is possible to reduce each term of the IEP formula so that some
+ terms might be repeated afterwards.
+ For this reason it is proposed to use a cache for storing already issued
+ queries as well as its respective results quantities in order to reduce
+ the number of issued queries.
+ However, work still need to be done to accelerate the computations of the
+ terms in the IEP formula.
+\end_layout
+
+\begin_layout Subsection
+Solution design
+\end_layout
+
+\begin_layout Standard
+QuantityEr is designed by using the object oriented paradigm.
+ Care on extension has been taken from the beginning by assigning a class
+ to each sub-process in the solution.
+ In figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Class-diagram"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is outlined the class diagram of the most important classes.
+ The classes are given as abstract base classes, so they must be extended
+ for a particular problem.
+ Currently the extensions for solving the problem in the specific case of
+ GitHub are implemented.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename class diagram/quantityer_class_diagram.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Class-diagram"
+
+\end_inset
+
+Class diagram of main classes of QuantityEr
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Next, it is briefly described each class.
+\end_layout
+
+\begin_layout Description
+Main: Coordinate the interaction between the Input, Engine and Output classes
+ objects.
+ That is, the main algorithm is implemented inside this class.
+\end_layout
+
+\begin_layout Description
+Input: Currently, the queries can be presented to QuantityEr from two sources:
+ the command line and files.
+ Several queries can be presented to the application in one single execution.
+ The responsibility of this class is to present this sources as a stream
+ to the Parser.
+ Since the logic of the input is encapsulated in one class, other kind of
+ inputs may be added in the future like, for example, inputs from the network.
+\end_layout
+
+\begin_layout Description
+Parser: Translate the queries presented as input to an standard language
+ that can be managed by the other entities.
+ Since the logic of parsing is encapsulated in one class the syntax of the
+ language used in the input queries do not need to be like the one expected
+ by GitHub.
+ This may ease the input allowing a more clean syntax.
+ More information about the current implemented syntax can be found in the
+ appendix in section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "subsec:Brackets-syntax"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Description
+MiddleCode: Represents the intermediate language that the other classes
+ understand.
+ All the queries inside the application are in this format.
+\end_layout
+
+\begin_layout Description
+Engine: Coordinate the interaction between the Decomposer, Cache, Translator
+ and QueryIssuer classes objects.
+ That is, the algorithm that give the solution to the problem is implemented
+ inside this class.
+\end_layout
+
+\begin_layout Description
+Decomposer: Decompose a complex query into several smaller simple queries.
+ Currently the extension using IEP is implemented.
+\end_layout
+
+\begin_layout Description
+Cache: Store the results amounts of already issued queries.
+ Currently an in-memory cache is available as well as a file-based one.
+\end_layout
+
+\begin_layout Description
+Translator: Translate a given simple sub-query to an issuable one.
+ Currently, only GitHub is supported but more platforms may be added in
+ the future.
+\end_layout
+
+\begin_layout Description
+QueryIssuer: Emit a simple sub-query to the platform and obtain the results
+ amount or inform of an error if it was the case.
+\end_layout
+
+\begin_layout Subsection
+Development technologies and libraries
+\end_layout
+
+\begin_layout Standard
+QuantityEr is written entirely in Python 3.7
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://www.python.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.python.org/3.7/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "kapil2019cleanpython"
+literal "true"
+
+\end_inset
+
+.
+ The main development libraries are:
+\end_layout
+
+\begin_layout Description
+PyGitHub
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/PyGithub/PyGithub
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://pygithub.readthedocs.io/en/latest/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+: A library to interact with GitHub API version 3.
+ It was used to emit the queries to the GitHub Search API
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://pygithub.readthedocs.io/en/latest/github.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Description
+Sympy
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://www.sympy.org/en/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/index.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "stewart2017sympya"
+literal "true"
+
+\end_inset
+
+: A library for symbolic mathematics.
+ The middle code managed by the internal components is a 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.core.basic.Basic
+\end_layout
+
+\end_inset
+
+ object
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/core.html
+\backslash
+#sympy.core.basic.Basic
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ Specifically the sub-classes 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.logic.boolalg.And
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/logic.html
+\backslash
+#sympy.logic.boolalg.And
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.logic.boolalg.Or
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/logic.html
+\backslash
+#sympy.logic.boolalg.Or
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.logic.boolalg.Not
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/logic.html
+\backslash
+#sympy.logic.boolalg.Not
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ where used.
+ Also, the 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.logic.boolalg.simplify_logic
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/logic.html
+\backslash
+#sympy.logic.boolalg.simplify_logic
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sympy.logic.boolalg.to_dnf
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.sympy.org/latest/modules/logic.html
+\backslash
+#sympy.logic.boolalg.to_dnf
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ functions where used to simplify Boolean expressions and to find the DNF
+ expression, respectively.
+\end_layout
+
+\begin_layout Description
+Argparse
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.python.org/3.7/library/argparse.html
+\backslash
+#module-argparse
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+: A library to writing command lines interfaces.
+ It was used extensively also to parse parameters from the command line
+ directly to classes Parser, Engine and Cache.
+ This allowed to extend the amount of options supported by QuantityEr.
+\end_layout
+
+\begin_layout Description
+Logging
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://docs.python.org/3.7/library/logging.html
+\backslash
+#module-logging
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+: An event logging system for applications and libraries.
+ It was used to show and store verbose and debug information.
+\end_layout
+
+\begin_layout Subsection
+Execution example results
+\end_layout
+
+\begin_layout Standard
+In this section we consider an usage example result in order to study the
+ behavior of the application with complex queries.
+\end_layout
+
+\begin_layout Standard
+In this case, the queries ask for the amount of source codes that use the
+ classical synchronization mechanisms defined in the 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+asyncio
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+multiprocessing
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset listings
+lstparams "language=Python"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+threading
+\end_layout
+
+\end_inset
+
+ Python libraries.
+\end_layout
+
+\begin_layout Standard
+The results are summarized in table 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "tab:Execution-example-results."
+
+\end_inset
+
+ and figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Sub-queries-amount.-Total"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The command lines options to the program, the actual output, the presented
+ queries as well as other execution example can be found in the appendix
+ in section 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "subsec:Raw-execution-example"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="8">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="middle" width="0.5cm">
+<column alignment="left" valignment="middle" width="2.3cm">
+<column alignment="left" valignment="middle">
+<column alignment="left" valignment="middle">
+<column alignment="left" valignment="middle">
+<column alignment="left" valignment="middle">
+<column alignment="left" valignment="middle">
+<column alignment="left" valignment="middle">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Sub-queries
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Cached
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Issued
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+No.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Queries libraries
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Amount
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Total
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset Formula $\boldsymbol{\#}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset Formula $\boldsymbol{\%}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset Formula $\boldsymbol{\#}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\begin_inset Formula $\boldsymbol{\%}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+69 053
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiprocessing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+159 515
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 451 344
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+04
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cap$
+\end_inset
+
+ multiprocessing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3 095
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 383
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 353
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99.82
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.18
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+05
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cap$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29 658
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 383
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 353
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99.82
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.18
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+06
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiprocessing 
+\begin_inset Formula $\cap$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+124 327
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+07
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cap$
+\end_inset
+
+ multiprocessing 
+\begin_inset Formula $\cap$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 947
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 383
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 353
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99.82
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.18
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+08
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cup$
+\end_inset
+
+ multiprocessing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+228 130
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+511
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+435
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+85.13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+76
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14.87
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+09
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cup$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 494 420
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+511
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+435
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+85.13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+76
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14.87
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiprocessing 
+\begin_inset Formula $\cup$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 489 850
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 023
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+930
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+90.91
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+93
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9.09
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asyncio 
+\begin_inset Formula $\cup$
+\end_inset
+
+ multiprocessing 
+\begin_inset Formula $\cup$
+\end_inset
+
+ threading
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 528 155
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 383
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16 185
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+98.79
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+198
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.21
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Execution-example-results."
+
+\end_inset
+
+Execution example results summary.
+ 
+\begin_inset Formula $\#$
+\end_inset
+
+ means quantity.
+ 
+\begin_inset Formula $\%$
+\end_inset
+
+ means percent.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /zfiles/Working_on/maestriia/tesis/util_scripts/search_engine/example_results_plot.png
+	scale 30
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Sub-queries-amount.-Total"
+
+\end_inset
+
+Sub-queries amount.
+ Total vs Issued
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In table 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "tab:Execution-example-results."
+
+\end_inset
+
+ and figure 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fig:Sub-queries-amount.-Total"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ can be seen that the amount of sub-queries depend on the ability of the
+ Sympy library to simplify the given expression.
+ Also, in this case, the presence of the cache effects a great reduction
+ on the amount of issued queries, specially when the number of sub-queries
+ is big.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Conclusions"
+
+\end_inset
+
+Conclusions
+\end_layout
+
+\begin_layout Standard
+In this report a tool, named QuantityEr, to obtain the results amount of
+ complex queries to GitHub search API has been described.
+ The application uses the inclusion-exclusion principle and other mathematical
+ abstractions to decompose the query in several simple sub-queries.
+ The application uses a cache in order to reduce the amount of sub-queries
+ issued to the server.
+ Even though it is considered that the use of the cache improve the solution
+ and makes it viable, more work may to be done in order to accelerate the
+ computations of the IEP formula terms.
+ Moreover, the application may be extended to resolve other restrictions
+ problems in GitHub and other platforms.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "quantityer"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Appendix"
+
+\end_inset
+
+Appendix
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Theorem predicates-sets"
+
+\end_inset
+
+Prof of theorem 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "theorem:predicates-sets"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following relations are satisfied for any 
+\begin_inset Formula $A=\big\{ x\mid P(x)\big\}$
+\end_inset
+
+ and 
+\begin_inset Formula $B=\big\{ x\mid Q(x)\big\}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(a)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A\cup B=\big\{ x\mid P(x)\lor Q(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(b)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A\cap B=\big\{ x\mid P(x)\land Q(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(c)
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $A^{\mathrm{C}}=\big\{ x\mid\neg P(x)\big\}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Proof
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(a)
+\end_layout
+
+\end_inset
+
+The definition of union from fact 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "fact:power-set-Boolean-algebra"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ is
+\begin_inset Formula 
+\begin{equation}
+A\cup B=\big\{ x\mid x\in A\lor x\in B\big\}\label{eq:AuB}
+\end{equation}
+
+\end_inset
+
+From the axioms of the theorem and applying definition 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "def:set-compression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ 
+\begin_inset Formula 
+\begin{eqnarray*}
+x\in A & \iff & P(x)\\
+x\in B & \iff & Q(x)
+\end{eqnarray*}
+
+\end_inset
+
+then substituting in right side of 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:AuB"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A\cup B=\big\{ x\mid P(x)\lor Q(x)\big\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(b)
+\end_layout
+
+\end_inset
+
+The procedure is analog to the one of proof (a)
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+(c)
+\end_layout
+
+\end_inset
+
+The procedure is analog to the one of proof (a)
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Brackets-syntax"
+
+\end_inset
+
+Brackets syntax
+\end_layout
+
+\begin_layout Standard
+In order to provide a clean syntax, without the need to specify each conjunction
+ and disjunction symbol, a simple language is used.
+\end_layout
+
+\begin_layout Standard
+In this language an expression inside square brackets is considered as a
+ conjunction set.
+ Similarly, an expression inside curly brackets is considered as a disjunction
+ set.
+ The negation is represented with tilde.
+ The language admits the declaration of expression identifiers by prefixing
+ with the at sign, so this identifiers can be used in subsequent parts of
+ the same query or other subsequent queries to refer to the same expression
+ by prefixing with the dollar sign.
+ For example, the expression 
+\family typewriter
+{a @exp[b c d] [$exp ~x]}
+\family default
+ is equivalent to the expression 
+\family typewriter
+a | (b & c & d) | ((b & c & d) & ~x)
+\family default
+ where 
+\family typewriter
+&
+\family default
+, 
+\family typewriter
+|
+\family default
+ and 
+\family typewriter
+~
+\family default
+ stand for conjunction, disjunction and negation, respectively.
+\end_layout
+
+\begin_layout Standard
+Next section shows execution examples of the use of complex queries in this
+ language.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:Raw-execution-example"
+
+\end_inset
+
+Raw execution example
+\end_layout
+
+\begin_layout Standard
+See attached document 
+\family typewriter
+examples.html
+\family default
+.
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,69 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/10 - multiprocessing-threading-union.in>
+
+        Results quantity: 1489850
+
+        Sub-queries total: 1023
+            From cache:      930 (90.9091% of total)
+            Issued:          93 (9.09091% of total)
+
+        Server begin datetime: 2019-11-24 01:34:40
+        Server end datetime:   2019-11-24 01:50:34
+
+        Runtime:                           0:15:54
+        Estimated runtime with caching:    from 0:03:06 to 0:21:42
+        Estimated runtime without caching: from 0:34:06 to 3:58:42
+
+
+    The processed query was:
+
+{
+    $multiprocessing
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python multiprocessing notify release set threading wait
+
+
+    Longest Subquery length: 118
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/10 - multiprocessing-threading-union.in>
+
+        Results quantity: 1490197
+
+        Sub-queries total: 1023
+            From cache:      1023 (100% of total)
+
+        Server begin datetime: 2019-11-24 03:13:56
+        Server end datetime:   2019-11-24 03:13:57
+
+        Runtime:                           0:00:01
+        Estimated runtime with caching:    from 0:00:00 to 0:00:00
+        Estimated runtime without caching: from 0:34:06 to 3:58:42
+
+
+    The processed query was:
+
+{
+    $multiprocessing
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python multiprocessing notify release set threading wait
+
+
+    Longest Subquery length: 118
+--------------------------------------------------------------------
+

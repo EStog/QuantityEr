@@ -1,0 +1,70 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/04 - asyncio-multiprocessing-interception.in>
+
+        Results quantity: 3095
+
+        Sub-queries total: 16383
+            From cache:      16353 (99.8169% of total)
+            Issued:          30 (0.183117% of total)
+
+        Server begin datetime: 2019-11-24 00:38:15
+        Server end datetime:   2019-11-24 00:46:02
+
+        Runtime:                           0:07:47
+        Estimated runtime with caching:    from 0:01:00 to 0:07:00
+        Estimated runtime without caching: from 9:06:06 to 2 days, 15:42:42
+
+
+    The processed query was:
+
+[
+    $asyncio
+    $multiprocessing
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python multiprocessing notify release set wait
+
+
+    Longest Subquery length: 116
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/04 - asyncio-multiprocessing-interception.in>
+
+        Results quantity: 3092
+
+        Sub-queries total: 16383
+            From cache:      16353 (99.8169% of total)
+            Issued:          30 (0.183117% of total)
+
+        Server begin datetime: 2019-11-24 02:48:35
+        Server end datetime:   2019-11-24 02:54:33
+
+        Runtime:                           0:05:58
+        Estimated runtime with caching:    from 0:01:00 to 0:07:00
+        Estimated runtime without caching: from 9:06:06 to 2 days, 15:42:42
+
+
+    The processed query was:
+
+[
+    $asyncio
+    $multiprocessing
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python multiprocessing notify release set wait
+
+
+    Longest Subquery length: 116
+--------------------------------------------------------------------
+

@@ -1,0 +1,120 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/03 - threading.in>
+
+        Results quantity: 1451344
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 00:32:34
+        Server end datetime:   2019-11-24 00:38:14
+
+        Runtime:                           0:05:40
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@threading [
+    threading
+    {
+        $barrier
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python notify release set threading wait
+
+
+    Longest Subquery length: 102
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/03 - threading.in>
+
+        Results quantity: 1454931
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 02:41:22
+        Server end datetime:   2019-11-24 02:48:35
+
+        Runtime:                           0:07:13
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@threading [
+    threading
+    {
+        $barrier
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python notify release set threading wait
+
+
+    Longest Subquery length: 102
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../running/queries/03 - threading.in>
+
+        Results quantity: 1444805
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 04:00:41
+        Server end datetime:   2019-11-24 04:07:12
+
+        Runtime:                           0:06:31
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@threading [
+    threading
+    {
+        $barrier
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python notify release set threading wait
+
+
+    Longest Subquery length: 102
+--------------------------------------------------------------------
+

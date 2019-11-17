@@ -1,0 +1,71 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/11 - asyncio-multiprocessing-threading-union.in>
+
+        Results quantity: 1528155
+
+        Sub-queries total: 16383
+            From cache:      16185 (98.7914% of total)
+            Issued:          198 (1.20857% of total)
+
+        Server begin datetime: 2019-11-24 01:50:34
+        Server end datetime:   2019-11-24 02:34:04
+
+        Runtime:                           0:43:30
+        Estimated runtime with caching:    from 0:06:36 to 0:46:12
+        Estimated runtime without caching: from 9:06:06 to 2 days, 15:42:42
+
+
+    The processed query was:
+
+{
+    $asyncio
+    $multiprocessing
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python multiprocessing notify release set threading wait
+
+
+    Longest Subquery length: 126
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/11 - asyncio-multiprocessing-threading-union.in>
+
+        Results quantity: 1530838
+
+        Sub-queries total: 16383
+            From cache:      16383 (100% of total)
+
+        Server begin datetime: 2019-11-24 03:13:58
+        Server end datetime:   2019-11-24 03:14:15
+
+        Runtime:                           0:00:17
+        Estimated runtime with caching:    from 0:00:00 to 0:00:00
+        Estimated runtime without caching: from 9:06:06 to 2 days, 15:42:42
+
+
+    The processed query was:
+
+{
+    $asyncio
+    $multiprocessing
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python multiprocessing notify release set threading wait
+
+
+    Longest Subquery length: 126
+--------------------------------------------------------------------
+

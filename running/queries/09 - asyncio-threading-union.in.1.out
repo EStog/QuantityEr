@@ -1,0 +1,69 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/09 - asyncio-threading-union.in>
+
+        Results quantity: 1494420
+
+        Sub-queries total: 511
+            From cache:      435 (85.1272% of total)
+            Issued:          76 (14.8728% of total)
+
+        Server begin datetime: 2019-11-24 01:24:14
+        Server end datetime:   2019-11-24 01:34:40
+
+        Runtime:                           0:10:26
+        Estimated runtime with caching:    from 0:02:32 to 0:17:44
+        Estimated runtime without caching: from 0:17:02 to 1:59:14
+
+
+    The processed query was:
+
+{
+    $asyncio
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python notify release set threading wait
+
+
+    Longest Subquery length: 110
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/09 - asyncio-threading-union.in>
+
+        Results quantity: 1496685
+
+        Sub-queries total: 511
+            From cache:      511 (100% of total)
+
+        Server begin datetime: 2019-11-24 03:13:55
+        Server end datetime:   2019-11-24 03:13:56
+
+        Runtime:                           0:00:01
+        Estimated runtime with caching:    from 0:00:00 to 0:00:00
+        Estimated runtime without caching: from 0:17:02 to 1:59:14
+
+
+    The processed query was:
+
+{
+    $asyncio
+    $threading
+}
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire asyncio clear language:Python notify release set threading wait
+
+
+    Longest Subquery length: 110
+--------------------------------------------------------------------
+

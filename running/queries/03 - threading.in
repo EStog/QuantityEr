@@ -1,0 +1,10 @@
+@threading [
+    threading
+    {
+        $barrier
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]

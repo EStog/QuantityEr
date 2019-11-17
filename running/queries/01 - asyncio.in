@@ -1,0 +1,9 @@
+@asyncio [
+    asyncio
+    {
+        @semaphores [{Lock Semaphore} acquire release]
+        @event      [Event set wait clear]
+        @condition  [Condition wait notify]
+    }
+    language:Python
+]

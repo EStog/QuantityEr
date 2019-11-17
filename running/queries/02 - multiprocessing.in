@@ -1,0 +1,10 @@
+@multiprocessing [
+    multiprocessing 
+    {
+        @barrier [Barrier wait]
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]

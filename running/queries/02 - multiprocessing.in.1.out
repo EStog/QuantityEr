@@ -1,0 +1,120 @@
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/02 - multiprocessing.in>
+
+        Results quantity: 159515
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 00:28:39
+        Server end datetime:   2019-11-24 00:32:34
+
+        Runtime:                           0:03:55
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@multiprocessing [
+    multiprocessing 
+    {
+        @barrier [Barrier wait]
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python multiprocessing notify release set wait
+
+
+    Longest Subquery length: 108
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../queries/02 - multiprocessing.in>
+
+        Results quantity: 160072
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 02:36:54
+        Server end datetime:   2019-11-24 02:41:22
+
+        Runtime:                           0:04:28
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@multiprocessing [
+    multiprocessing 
+    {
+        @barrier [Barrier wait]
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python multiprocessing notify release set wait
+
+
+    Longest Subquery length: 108
+--------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------
+    Results for query 1 from <../running/queries/02 - multiprocessing.in>
+
+        Results quantity: 159827
+
+        Sub-queries total: 31
+            Issued:          31 (100% of total)
+
+        Server begin datetime: 2019-11-24 03:54:37
+        Server end datetime:   2019-11-24 04:00:41
+
+        Runtime:                           0:06:04
+        Estimated runtime with caching:    from 0:01:02 to 0:07:14
+        Estimated runtime without caching: from 0:01:02 to 0:07:14
+
+
+    The processed query was:
+
+@multiprocessing [
+    multiprocessing 
+    {
+        @barrier [Barrier wait]
+        $semaphores
+        $event
+        $condition
+    }
+    language:Python
+]
+
+
+    Longest subquery:
+
+Barrier Condition Event Lock Semaphore acquire clear language:Python multiprocessing notify release set wait
+
+
+    Longest Subquery length: 108
+--------------------------------------------------------------------
+

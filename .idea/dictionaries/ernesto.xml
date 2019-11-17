@@ -1,3 +1,20 @@
 <component name="ProjectDictionaryState">
-  <dictionary name="ernesto" />
+  <dictionary name="ernesto">
+    <words>
+      <w>argparse</w>
+      <w>asctime</w>
+      <w>asyncio</w>
+      <w>backoff</w>
+      <w>bidict</w>
+      <w>bijective</w>
+      <w>decomposer</w>
+      <w>gómez</w>
+      <w>injective</w>
+      <w>levelname</w>
+      <w>passw</w>
+      <w>subqueries</w>
+      <w>sympify</w>
+      <w>sympy</w>
+    </words>
+  </dictionary>
 </component>
