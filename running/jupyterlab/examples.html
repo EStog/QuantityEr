@@ -16195,7 +16195,7 @@ Adapted from GitHub theme
     </style>
 
     <!-- Custom stylesheet, it must be in the same directory as the html file -->
-    <link rel="stylesheet" href="custom.css">
+    <link href="custom.css" rel="stylesheet">
 
     <!-- Loading mathjax macro -->
     <!-- Load mathjax -->
@@ -16218,10 +16218,11 @@ Adapted from GitHub theme
         }
     });
 
+
     </script>
     <!-- End of mathjax configuration --></head>
 <body>
-<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="border-box-sizing" id="notebook" tabindex="-1">
     <div class="container" id="notebook-container">
 
         <div class="cell border-box-sizing text_cell rendered">
