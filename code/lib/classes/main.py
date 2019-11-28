@@ -42,7 +42,7 @@ class Main(WithLogging, WithExternalArguments):
     def _get_inputs(self) -> Iterable[Input]:
         # noinspection PyUnresolvedReferences
         if not self.queries and self.input_paths is None:
-            exit(0)
+            self._args_parser.error('No input specified')
         inputs = []
         # noinspection PyUnresolvedReferences
         if self.queries:
@@ -87,7 +87,8 @@ class Main(WithLogging, WithExternalArguments):
         return outputs
 
     def _main_logic(self):
-        # noinspection PyUnresolvedReferences
+        inputs = self._get_inputs()
+        outputs = self._get_outputs()
         # noinspection PyUnresolvedReferences
         engine = get_component(self.engine_options, ENGINE_TYPE, 'engine',
                                self._args_parser,
@@ -95,8 +96,6 @@ class Main(WithLogging, WithExternalArguments):
                                input_caches_options=self.input_caches_options,
                                simulate=self.simulate,
                                main_args_parser=self._args_parser)
-        inputs = self._get_inputs()
-        outputs = self._get_outputs()
         for i in inputs:
             for middle_code in i.get_middle_codes():
                 results = engine.get_total_amount(middle_code)
