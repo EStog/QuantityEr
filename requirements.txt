@@ -1,0 +1,6 @@
+pygithub >= 1.44
+sympy >= 1.4
+colorama >= 0.4.1
+matplotlib >= 3.1.2
+urllib3 >= 1.25.6
+argparse >= 1.4.0
