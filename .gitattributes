@@ -1,4 +1,4 @@
-.idea/* linguist-vendored
+./.idea/* linguist-vendored
 requirements.txt linguist-vendored
 
 # Basic .gitattributes for a python repo.
