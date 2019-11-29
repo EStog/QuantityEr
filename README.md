@@ -1,2 +1,2 @@
 # QuantityEr
-A program to obtain results amounts of complex queries to GitHub.
+A program to obtain results amounts of complex queries to GitHubrf4rde
