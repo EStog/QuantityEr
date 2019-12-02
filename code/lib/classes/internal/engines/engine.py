@@ -63,7 +63,7 @@ class Engine(WithLoggingAndExternalArguments, ABC):
         self._debug('Longest subquery', longest_subquery, header=middle_code.full_name)
         longest_subquery_length = len(longest_subquery)
         self._debug('Longest subquery length', longest_subquery_length, header=middle_code.full_name)
-        if not self._query_issuer.check_query_length(longest_subquery_length, middle_code.full_name):
+        if not self._query_issuer.check_query_restrictions(longest_subquery, middle_code.full_name):
             self._debug('Subqueries that exceeds the maximum allowed length, will be discarded',
                         header=middle_code.full_name)
         self._debug('Getting total amount of subqueries ...', header=middle_code.full_name)
@@ -147,7 +147,7 @@ class Engine(WithLoggingAndExternalArguments, ABC):
                 if subquery not in self._cache:
                     self._debug('To issue', header=q.full_name)
                     to_issue_subqueries += 1
-                    if not self._query_issuer.check_query_length(len(subquery), q.full_name):
+                    if not self._query_issuer.check_query_restrictions(subquery, q.full_name):
                         self._debug(f'Subquery discarded', header=q.full_name)
                     else:
                         self._simulation_cache.add(subquery)
