@@ -20,7 +20,7 @@ class QueryIssuer(WithLogging):
         pass
 
     @abstractmethod
-    def check_query_length(self, query_length: int, name: str) -> bool:
+    def check_query_restrictions(self, query: str, name: str) -> bool:
         pass
 
     @abstractmethod

@@ -87,7 +87,7 @@ class GithubV3QueryIssuer(QueryIssuer):
             func(message, arg, header=name)
 
         verbose(self._debug, f'Getting results amount ...')
-        if not self.check_query_length(len(query), name):
+        if not self.check_query_restrictions(query, name):
             verbose(self._debug, f'Subquery discarded')
             return False, 0
         delay = self._get_waiting_time()
@@ -111,15 +111,29 @@ class GithubV3QueryIssuer(QueryIssuer):
         except GithubException as e:
             verbose(self._query_critical, f'Error while issuing', e)
 
-    def check_query_length(self, query_length: int, name: str) -> bool:
-        if query_length > self._query_max_length:
+    def check_query_restrictions(self, query: str, name: str) -> bool:
+        query_len = len(query)
+        logical_not_amount = query.count('NOT ')
+        if query_len > self._query_max_length:
             if self._admit_long_query:
-                self._warning(f'Maximum allowed length of {self._query_max_length} exceeded. Subquery length',
-                              arg=query_length, header=name)
+                self._warning(f'Maximum allowed length of {self._query_max_length} exceeded. '
+                              'Subquery length',
+                              arg=query_len, header=name)
                 return False
             else:
-                self._query_critical(f'Maximum allowed length of {self._query_max_length} exceeded. Subquery length',
-                                     arg=query_length, header=name)
+                self._query_critical(f'Maximum allowed length of {self._query_max_length} exceeded. '
+                                     f'Subquery length',
+                                     arg=query_len, header=name)
+        elif logical_not_amount > 5:
+            if self._admit_long_query:
+                self._warning(f'Maximum allowed logical NOT amount of 5 exceeded. '
+                              f'Logical NOT amount',
+                              arg=logical_not_amount, header=name)
+                return False
+            else:
+                self._query_critical(f'Maximum allowed logical NOT amount of 5 exceeded. '
+                                     f'Logical NOT amount',
+                                     arg=logical_not_amount, header=name)
         else:
             return True
 
