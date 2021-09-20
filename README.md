@@ -1,4 +1,4 @@
-![release (latest by date including pre-releases)](https://img.shields.io/github/v/release/EStog/QuantityEr?include_prereleases) ![license](https://img.shields.io/github/license/EStog/QuantityEr) ![repo size](https://img.shields.io/github/repo-size/EStog/QuantityEr)
+![release (latest by date including pre-releases)](https://img.shields.io/github/v/release/EStog/QuantityEr?include_prereleases) [![DOI](https://www.zenodo.org/badge/224730670.svg)](https://www.zenodo.org/badge/latestdoi/224730670) ![license](https://img.shields.io/github/license/EStog/QuantityEr) ![repo size](https://img.shields.io/github/repo-size/EStog/QuantityEr)
 # QuantityEr
 
 A program to obtain result amounts of complex queries to GitHub.
