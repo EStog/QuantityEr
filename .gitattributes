@@ -1,2 +1,3 @@
 .idea/* linguist-vendored
 requirements.txt linguist-vendored
+*.html linguist-detectable=false
